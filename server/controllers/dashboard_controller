@@ -1,0 +1,49 @@
+const Dashboard = require('../models/Dashboard')
+const bodyParser = require('body-parser')
+
+
+
+function getDashboard (request, response){
+   Dashboard.findAll_dashboard()
+    .then(result => response.status(200).send(JSON.stringify(result)));
+
+}
+
+function getDashboardById (request, response){
+  Dashboard.findById_dashboard(request.params.id)
+    .then(result => response.status(200).send(JSON.stringify(result)));
+
+}
+
+function getDashboardByName (request, response){
+  Dashboard.findByName_dashboard(request.params.name)
+    .then(result => response.status(200).send(JSON.stringify(result)));
+
+}
+
+function getDashboardByYear (request, response){
+  Dashboard.findByYear_dashboard(request.params.year)
+    .then(result => response.status(200).send(JSON.stringify(result)));
+
+}
+
+function getLayers (request, response){
+  Dashboard.findLayers_dashboard(request.params.id)
+    .then(result => response.status(200).send(JSON.stringify(result)));
+
+}
+
+function getDataDashboard (request, response){
+  Dashboard.findByData_dashboard(request.params.id, request.params.name_data)
+    .then(result => response.status(200).send(JSON.stringify(result)));
+
+}
+
+
+module.exports = {
+  getDashboard,
+  getDashboardById,
+  getDashboardByName,
+  getDashboardByYear,
+  getDataDashboard
+}

@@ -1,0 +1,66 @@
+const Sequelize = require('sequelize');
+const sequelize = require('../config/database')
+
+const Dashboard = sequelize.define('dashboards',{
+  id: {
+    type: Sequelize.INTEGER,
+    primaryKey:true
+
+  },
+  datos: {
+      type: Sequelize.JSON
+
+  }
+
+},{
+  timestamps:false,
+
+});
+
+
+findAll_dashboard = function(){
+   return Dashboard.findAll().then (result => {return result})
+}
+
+
+findById_dashboard = function(id_prov){
+   return Dashboard.findOne({ where: { id: id_prov }}).then (result => {return result})
+}
+
+
+findByName_dashboard = function(nom){
+   return Dashboard.findOne({ where: { datos: {nombre:nom}  }}).then (result => {return result})
+}
+
+
+findByYear_dashboard = function(year){
+   return Dashboard.findAll({ where: { datos: {año:year}  }}).then (result => {return result})
+}
+
+findByData_dashboard = function(nom,data){
+   return Dashboard.findOne({ where: { datos: {nombre:nom}  }}).then (result => {
+       var datos = result.datos;
+       var param;
+
+       for(var key in datos)
+           {
+           	if (key == data){
+           	  param = datos[key];
+           	}
+           }
+
+       return param;
+
+     })
+}
+
+
+module.exports = {
+  Dashboard,
+  findAll_dashboard,
+  findById_dashboard,
+  findByName_dashboard,
+  findByYear_dashboard,
+  findByData_dashboard
+
+}

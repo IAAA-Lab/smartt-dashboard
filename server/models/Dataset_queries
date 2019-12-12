@@ -1,0 +1,144 @@
+const Sequelize = require('sequelize');
+const sequelize = require('../config/database')
+const dt = require('../models/Dataset')
+const bodyParser = require('body-parser')
+
+
+
+findAll_data = function(nom){
+  return dt.Dataset.findOne({ where: { datos: {nombre:nom}  }}).then (result => {
+    console.log(JSON.stringify(result.datos.nombre));
+    let nombre = result.datos.nombre;
+    return sequelize.query('SELECT * FROM ' + nombre ,
+      { type: sequelize.QueryTypes.SELECT }
+    ).then(result => {
+      console.log(result);
+      return result;
+    })
+
+  })
+}
+
+findByItems = function(nom,item){
+  return dt.Dataset.findOne({ where: { datos: {nombre:nom}  }}).then (result => {
+    //console.log(JSON.stringify(result.datos.items));
+    var nombre = result.datos.nombre;
+    var items = result.datos.items;
+    var data = [result.datos.id.name, result.datos.name.name];
+    var param;
+
+    for(var key in items)
+    {
+    	if (key == item){
+    	  param = key;
+    	  console.log(param);
+    	}
+    }
+
+    return sequelize.query('SELECT '+ data[0] + ',' + data[1] +  ',' + param  +' FROM ' + nombre ,
+      { type: sequelize.QueryTypes.SELECT }
+    ).then(result => {
+      console.log(result);
+      return result;
+    })
+
+  })
+}
+
+findByData = function(nom,data){
+   return dt.Dataset.findOne({ where: { datos: {nombre:nom}  }}).then (result => {
+     console.log(JSON.stringify(result.datos.nombre));
+     var nombre = result.datos.nombre;
+     var datos = result.datos;
+     var param;
+
+     for(var key in datos)
+     {
+     	if (key == data){
+     	  param = datos[key].name;
+     	}
+     }
+
+     return sequelize.query('SELECT '+ param +' FROM ' + nombre ,
+       { type: sequelize.QueryTypes.SELECT }
+     ).then(result => {
+       console.log(result);
+       return result;
+     })
+
+   })
+
+}
+
+TotalItems = function(nom,item){
+   return dt.Dataset.findOne({ where: { datos: {nombre:nom}  }}).then (result => {
+       //console.log(JSON.stringify(result.datos.items));
+       var nombre = result.datos.nombre;
+       var items = result.datos.items;
+       var param;
+
+       for(var key in items)
+       {
+       	if (key == item){
+       	  param = key;
+       	  console.log(param);
+       	}
+       }
+
+       return sequelize.query('SELECT SUM('+ param +') FROM ' + nombre ,
+         { type: sequelize.QueryTypes.SELECT }
+       ).then(result => {
+         console.log(result);
+         return result;
+       })
+
+     })
+
+}
+
+findById = function(nom,data,id){
+   return dt.Dataset.findOne({ where: { datos: {nombre:nom}  }}).then (result => {
+     console.log(JSON.stringify(result.datos.nombre));
+     var nombre = result.datos.nombre;
+     var datos = result.datos;
+     var param;
+     var params=[];
+     var d=[datos.id.name,datos.name.name];
+
+     for(var key in datos)
+     {
+     	if (key == data){
+     	  param = datos[key].name;
+
+     	}
+     }
+
+     for(var k in datos.items)
+     {
+        params.push(k);
+        console.log(params);
+
+     }
+
+
+      return sequelize.query('SELECT '+ d.join(',') + ','+ params.join(',') + ' FROM ' + nombre + ' WHERE '+ param +'=$id',
+        { bind: {id: id }, type: sequelize.QueryTypes.SELECT }
+      ).then(result => {
+        console.log(result);
+        return result;
+      })
+
+
+   })
+
+}
+
+
+module.exports = {
+  findAll_data,
+  findByItems,
+  findByData,
+  TotalItems,
+  findById
+
+}
