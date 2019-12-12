@@ -4,6 +4,32 @@
           <p>SMARTT-DASHBOARD</p>
     </header>
 
+    <div class="modal fade" id="mostrarmodal" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+               <div class="modal-header">
+                  <h3>Elige Provincias y Municipios</h3>
+               </div>
+               <div class="modal-body">
+                   <p>Provincias</p>
+                   <select name="prov" id="prov" @change="onChange($event)" v-model="prov_select" class="form-control" style="height:40px; width:80%">
+                       <option v-for="item in provincias" :value="item">{{item}}</option>
+                    </select>
+                    <br>
+                   <p>Municipios</p>
+                    <select name="mun" @change="onChange($event)" v-model="mun_select" class="form-control" style="height:40px; width:80%">
+                       <option v-for="item in municipios" :value="item">{{item}}</option>
+                    </select>
+                    <br>
+                    <span class='label label-warning'>*Para que aparezcan los municipios selecciones primero la provincia</span>
+           </div>
+               <div class="modal-footer">
+              <a href="#" data-dismiss="modal" class="btn btn-danger" @click="initGrap()">Aceptar</a>
+               </div>
+          </div>
+       </div>
+    </div>
+
     <div id ="info">
       <div id ="info1"> <!--widget 1 -->
 
@@ -76,13 +102,41 @@
     </div>
 
     <div id="grafica-container">
-      <div id= "mapa-header">
-          <p> Poblacion </p>
-      </div>
+        <div id="grafica">
+          <ul class="nav nav-tabs">
+            <li class="nav-item">
+              <a class="nav-link active" data-toggle="tab" href="#p_mun">Población {{this.mun_select}}</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-toggle="tab" href="#p_prov">Población {{this.prov_select}}</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-toggle="tab" href="#v_mun">Vehiculos {{this.mun_select}}</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-toggle="tab" href="#v_prov">Vehiculos {{this.prov_select}}</a>
+            </li>
+          </ul>
 
-      <div id= "grafica">
-              <highcharts :options="chartOptions" ></highcharts>
-      </div>
+
+
+          <div class="tab-content">
+            <div id="p_mun" class="container tab-pane active"><br>
+              <highcharts :options="chartOptions_mun" style="width:80%"></highcharts>
+            </div>
+            <div id="p_prov" class="container tab-pane fade"><br>
+              <highcharts :options="chartOptions_prov" style="width:80%"></highcharts>
+            </div>
+            <div id="v_mun" class="container tab-pane fade"><br>
+              <highcharts :options="chartOptions_v_mun" style="width:80%"></highcharts>
+            </div>
+            <div id="v_prov" class="container tab-pane fade"><br>
+              <highcharts :options="chartOptions_v_prov" style="width:80%"></highcharts>
+            </div>
+          </div>
+        </div>
+
+
 
 
 
@@ -159,20 +213,116 @@ export default {
 
            title: '',
            modo: 'line',
-           series: [
-                       {
-                         name: "hombres",
-                         data: []
-                       },
-                       {
-                         name: "mujeres",
-                         data: []
-                       },
-                                   ],
+           series_mun: [
+                 {
+                   name: "hombres",
+                   data: []
+                 },
+                 {
+                   name: "mujeres",
+                   data: []
+                 },
+           ],
+           series_prov: [
+                 {
+                   name: "hombres",
+                   data: []
+                 },
+                 {
+                   name: "mujeres",
+                   data: []
+                 },
+            ],
+            series_v: [
+                 {
+                    name: "camiones_furgonetas",
+                    data: []
+                 },
+                 {
+                     name: "autobuses",
+                     data: []
+                 },
+                 {
+                     name: "turismos",
+                     data: []
+                 },
+                 {
+                     name: "motocicletas",
+                     data: []
+                 },
+                 {
+                     name: "tractores",
+
+                     data: []
+                 },
+                 {
+                     name: "remolques",
+                     data: []
+                 },
+                 {
+                     name: "otros_vehiculos",
+                     data: []
+                 },
+
+
+            ],
+            series_v_prov: [
+                 {
+                    name: "camiones_furgonetas",
+                    data: []
+                 },
+                 {
+                     name: "autobuses",
+                     data: []
+                 },
+                 {
+                     name: "turismos",
+                     data: []
+                 },
+                 {
+                     name: "motocicletas",
+                     data: []
+                 },
+                 {
+                     name: "tractores",
+
+                     data: []
+                 },
+                 {
+                     name: "remolques",
+                     data: []
+                 },
+                 {
+                     name: "otros_vehiculos",
+                     data: []
+                 },
+
+
+            ],
+           provincias: [],
+           municipios: [],
+           prov_select: null,
+           mun_select: null,
           }
+
     },
   computed: {
-      chartOptions() {
+      chartOptions_mun() {
+          return {
+                  chart: {  type: this.modo},
+                  title: {  text: this.title  },
+                  xAxis: {
+                            categories: [
+                              "2015",
+                              "2016",
+                              "2017",
+                              "2018",
+                            ]
+                          },
+                  series: this.series_mun,
+            }
+      },
+      chartOptions_prov() {
           return {
                   chart: {  type: this.modo},
                   title: {  text: this.title  },
@@ -183,17 +333,83 @@ export default {
                               "2018",
                             ]
                           },
-                  series: this.series,
-            }
+                  series: this.series_prov,
+           }
       },
+       chartOptions_v_mun() {
+            return {
+                    chart: {  type: this.modo},
+                    title: {  text: this.title  },
+                    xAxis: {
+                              categories: [
+                                "2015",
+                                "2016",
+                                "2017",
+                                "2018",
+                              ]
+                            },
+                    series: this.series_v,
+             }
+       },
+        chartOptions_v_prov() {
+             return {
+                     chart: {  type: this.modo},
+                     title: {  text: this.title  },
+                     xAxis: {
+                               categories: [
+                                 "2016",
+                                 "2017",
+                                 "2018",
+                               ]
+                             },
+                     series: this.series_v_prov,
+              }
+        },
   },
   mounted(){
-      this.initMap();
-      this.initGrap();
+      this.cargarProvincias();
+      $(document).ready(function()
+            {
+               $("#mostrarmodal").modal("show");
 
+      });
+      this.initMap();
 
   },
   methods: {
+      cargarProvincias(){
+
+        axios({
+          method: 'get',
+          url: 'http://localhost:3000/api/datasets/p_poblacion18/data/name'}
+        ).then(response => {
+           var data = response.data
+           for(var key in data){
+             this.provincias.push(data[key].nom)
+           }
+          }
+        ).catch(function (error) {
+          console.log('Error: ' + error);
+        });
+
+      },
+
+      onChange($event){
+           axios({
+              method: 'get',
+              url: 'http://localhost:3000/api/datasets/p_poblacion18/data/name/'+this.prov_select}
+           ).then(response => {
+              var code = response.data[0].cod;
+
+
+            }
+           ).catch(function (error) {
+              console.log('Error: ' + error);
+           });
+
+      },
+
+
       initMap(){
         const map = L.map( 'map', {
             maxZoom: 16,
@@ -215,33 +431,112 @@ export default {
       },
 
       initGrap(){
+          for (var i=15; i<19; i++){
+              axios({
+                method: 'get',
+                url: 'http://localhost:3000/api/datasets/m_poblacion'+i+'/data/name/'+this.mun_select}
+              ).then(response => {
+                 this.series_mun[1].data.push(parseInt(response.data[0].women));
+                 this.series_mun[0].data.push(parseInt(response.data[0].men));
+                }
+              ).catch(function (error) {
+                console.log('Error: ' + error);
+               });
 
-          for (var i=16; i<19; i++){
+               if (i>15){
+                   axios({
+                     method: 'get',
+                     url: 'http://localhost:3000/api/datasets/p_poblacion'+i+'/data/name/'+this.prov_select}
+                   ).then(response => {
+                      this.series_prov[1].data.push(parseInt(response.data[0].muj));
+                      this.series_prov[0].data.push(parseInt(response.data[0].hom));
+                     }
+                   ).catch(function (error) {
+                     console.log('Error: ' + error);
+                    });
+               }
 
-          axios({
-            method: 'get',
-            url: 'http://localhost:3000/poblacion/mujeres'+i}
-          ).then(response => {
-             this.series[1].data.push(parseInt(response.data[0].sum));
-            }
-          ).catch(function (error) {
-            console.log('Error: ' + error);
-           });
+               if (i<17){
+                   axios({
+                     method: 'get',
+                     url: 'http://localhost:3000/api/datasets/m_parque'+i+'/data/name/'+this.mun_select}
+                   ).then(response => {
 
-           axios({
-             method: 'get',
-             url: 'http://localhost:3000/poblacion/hombres'+i}
-           ).then(response => {
-              this.series[0].data.push(parseInt(response.data[0].sum));
-             }
-           ).catch(function (error) {
-             console.log('Error: ' + error);
-            });
+                       this.series_v[0].data.push(parseInt(response.data[0].camiones_furgonetas));
+                       this.series_v[1].data.push(parseInt(response.data[0].autobuses));
+                       this.series_v[2].data.push(parseInt(response.data[0].turismos));
+                       this.series_v[3].data.push(parseInt(response.data[0].motocicletas));
+                       this.series_v[4].data.push(parseInt(response.data[0].tractores));
+                       this.series_v[5].data.push(parseInt(response.data[0].remolques));
+                       this.series_v[6].data.push(parseInt(response.data[0].otros_vehiculos));
+
+
+                    }
+                   ).catch(function (error) {
+                     console.log('Error: ' + error);
+                    });
+               }
+               else {
+                  axios({
+                  method: 'get',
+                  url: 'http://localhost:3000/api/datasets/m_parque'+i+'/data/name/'+this.mun_select}
+                 ).then(response => {
+
+                     this.series_v[0].data.push(parseInt(response.data[0].camiones)+parseInt(response.data[0].furgonetas));
+                     this.series_v[1].data.push(parseInt(response.data[0].autobuses));
+                     this.series_v[2].data.push(parseInt(response.data[0].turismos));
+                     this.series_v[3].data.push(parseInt(response.data[0].motocicletas));
+                     this.series_v[4].data.push(parseInt(response.data[0].tractores));
+                     this.series_v[5].data.push(parseInt(response.data[0].remolques));
+                     this.series_v[6].data.push(parseInt(response.data[0].otros_vehiculos));
+                  }
+                 ).catch(function (error) {
+                   console.log('Error: ' + error);
+                  });
+                }
+
+                if (i>15 & i<17){
+                    axios({
+                      method: 'get',
+                      url: 'http://localhost:3000/api/datasets/p_parque'+i+'/data/name/'+this.prov_select}
+                    ).then(response => {
+
+                        this.series_v_prov[0].data.push(parseInt(response.data[0].camiones_furgonetas));
+                        this.series_v_prov[1].data.push(parseInt(response.data[0].autobuses));
+                        this.series_v_prov[2].data.push(parseInt(response.data[0].turismos));
+                        this.series_v_prov[3].data.push(parseInt(response.data[0].motocicletas));
+                        this.series_v_prov[4].data.push(parseInt(response.data[0].tractores));
+                        this.series_v_prov[5].data.push(parseInt(response.data[0].remolques));
+                        this.series_v_prov[6].data.push(parseInt(response.data[0].otros_vehiculos));
+
+
+                     }
+                    ).catch(function (error) {
+                      console.log('Error: ' + error);
+                     });
+                }
+                else {
+                   axios({
+                   method: 'get',
+                   url: 'http://localhost:3000/api/datasets/p_parque'+i+'/data/name/'+this.prov_select}
+                  ).then(response => {
+
+                      this.series_v_prov[0].data.push(parseInt(response.data[0].camiones)+parseInt(response.data[0].furgonetas));
+                      this.series_v_prov[1].data.push(parseInt(response.data[0].autobuses));
+                      this.series_v_prov[2].data.push(parseInt(response.data[0].turismos));
+                      this.series_v_prov[3].data.push(parseInt(response.data[0].motocicletas));
+                      this.series_v_prov[4].data.push(parseInt(response.data[0].tractores));
+                      this.series_v_prov[5].data.push(parseInt(response.data[0].remolques));
+                      this.series_v_prov[6].data.push(parseInt(response.data[0].otros_vehiculos));
+                   }
+                  ).catch(function (error) {
+                    console.log('Error: ' + error);
+                   });
+
+                 }
 
           }
-
       },
-
 
        layerChanged(layerId, active, layer) {
 
@@ -364,8 +659,8 @@ export default {
 #grafica{
   height: auto;
   width:100%;
-  border: 1px solid #AAA;
   position:absolute;
+  margin-top:3%;
   top:5%;
 
 }
