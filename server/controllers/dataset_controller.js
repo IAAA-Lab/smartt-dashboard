@@ -61,6 +61,11 @@ function getDataById(request, response){
 
 }
 
+function getCoordinates(request, response){
+  Dataset_queries.findCoordinates(request.params.id, request.params.id_data)
+    .then(prov => response.status(200).send(JSON.stringify(prov)));
+
+}
 
 
 module.exports = {
@@ -72,5 +77,6 @@ module.exports = {
   getDataByItems,
   getDataByParams,
   getTotalByItems,
-  getDataById
+  getDataById,
+  getCoordinates
 }

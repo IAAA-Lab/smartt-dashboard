@@ -19,6 +19,7 @@ router.get('/datasets/:id/item/:name_item', dataset_controller.getDataByItems);
 router.get('/datasets/:id/data/:name_data', dataset_controller.getDataByParams);
 router.get('/datasets/:id/total_item/:name_item', dataset_controller.getTotalByItems);
 router.get('/datasets/:id/data/:name_data/:id_data', dataset_controller.getDataById);
+router.get('/datasets/:id/coordinates/:id_data', dataset_controller.getCoordinates);
 
 router.get('/dashboard', dashboard_controller.getDashboard);
 router.get('/dashboard/id/:id', dashboard_controller.getDashboardById);

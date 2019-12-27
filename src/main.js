@@ -1,9 +1,14 @@
 import Vue from 'vue'
+import VueRouter from 'vue-router';
+Vue.use(VueRouter);
+
 import App from './App.vue'
+
 import * as Vue2Leaflet from 'vue2-leaflet'
 import {LMap,LTitleLayer,LMarker} from 'vue2-leaflet'
 import "leaflet.icon.glyph";
 import { Icon } from "leaflet";
+
 
 
 
@@ -20,6 +25,41 @@ Icon.Default.mergeOptions({
   shadowUrl: require("leaflet/dist/images/marker-shadow.png")
 });
 
-new Vue({
+Vue.config.productionTip = false;
+
+import Municipios from './components/Municipios'
+import Provincias from './components/Provincias'
+
+const routes = [
+  {
+    name: 'App',
+    path: '/',
+    component: App,
+    props: true
+  },
+  {
+    name: 'Municipios',
+    path: '/municipios',
+    component: Municipios,
+    props: true
+  },
+  {
+    name: 'Provincias',
+    path: '/provincias',
+    component: Provincias,
+    props: true
+  },
+
+];
+
+const router = new VueRouter
+({
+  mode: 'history',
+  routes
+});
+
+window.app = new Vue({
+  el: '#app',
+  router,
   render: h => h(App)
-}).$mount("#app");
+});

@@ -23,8 +23,8 @@ findByItems = function(nom,item){
   return dt.Dataset.findOne({ where: { datos: {nombre:nom}  }}).then (result => {
     //console.log(JSON.stringify(result.datos.items));
     var nombre = result.datos.nombre;
-    var items = result.datos.items;
-    var data = [result.datos.id.name, result.datos.name.name];
+    var items = result.datos.table_data.items;
+    var data = [result.datos.table_data.id.name, result.datos.table_data.name.name];
     var param;
 
     for(var key in items)
@@ -49,21 +49,44 @@ findByData = function(nom,data){
    return dt.Dataset.findOne({ where: { datos: {nombre:nom}  }}).then (result => {
      console.log(JSON.stringify(result.datos.nombre));
      var nombre = result.datos.nombre;
-     var datos = result.datos;
+     var datos = result.datos.table_data;
      var param;
+     var param1 = datos.name.name;
 
      for(var key in datos)
      {
      	if (key == data){
      	  param = datos[key].name;
      	}
+
      }
 
-     return sequelize.query('SELECT '+ param +' FROM ' + nombre ,
+     if (data == 'name'){
+        param1 = datos.id.name;
+        console.log(param1);
+     }
+
+     return sequelize.query('SELECT ' + param1 + ','+ param +' FROM ' + nombre + ' ORDER BY '+ param  ,
        { type: sequelize.QueryTypes.SELECT }
      ).then(result => {
-       console.log(result);
-       return result;
+        var data = []
+        var datos;
+
+        for (var i=0; i<result.length; i++){
+            console.log(result[i]);
+            datos = result[i];
+            if (result[i].nom!=null){
+              data.push(datos);
+            }
+             if (result[i].name!=null){
+              data.push(datos);
+            }
+
+        }
+
+
+        console.log(result.length);
+        return data;
      })
 
    })
@@ -74,7 +97,7 @@ TotalItems = function(nom,item){
    return dt.Dataset.findOne({ where: { datos: {nombre:nom}  }}).then (result => {
        //console.log(JSON.stringify(result.datos.items));
        var nombre = result.datos.nombre;
-       var items = result.datos.items;
+       var items = result.datos.table_data.items;
        var param;
 
        for(var key in items)
@@ -97,13 +120,16 @@ TotalItems = function(nom,item){
 }
 
 findById = function(nom,data,id){
+
    return dt.Dataset.findOne({ where: { datos: {nombre:nom}  }}).then (result => {
      console.log(JSON.stringify(result.datos.nombre));
-     var nombre = result.datos.nombre;
-     var datos = result.datos;
-     var param;
-     var params=[];
-     var d=[datos.id.name,datos.name.name];
+      var nombre= result.datos.nombre;
+      var datos=result.datos.table_data;
+      var param;
+      var params=[];
+      var d=[];
+      var year= result.datos.año;
+
 
      for(var key in datos)
      {
@@ -111,8 +137,12 @@ findById = function(nom,data,id){
      	  param = datos[key].name;
 
      	}
-     }
+     	if (key != 'items'){
+     	  d.push(datos[key].name);
+     	}
 
+     }
+      console.log(d);
      for(var k in datos.items)
      {
         params.push(k);
@@ -121,11 +151,20 @@ findById = function(nom,data,id){
      }
 
 
-      return sequelize.query('SELECT '+ d.join(',') + ','+ params.join(',') + ' FROM ' + nombre + ' WHERE '+ param +'=$id',
+      return sequelize.query('SELECT '+ d.join(',') + ','+ params.join(',') + ' FROM ' + nombre + ' WHERE '+ param +'=$id ORDER BY '+ datos.name.name,
         { bind: {id: id }, type: sequelize.QueryTypes.SELECT }
       ).then(result => {
-        console.log(result);
-        return result;
+        var data = []
+        var datos;
+        for (var i=0; i<result.length; i++){
+            datos = result[i];
+            datos["año"] = year;
+            data.push(datos);
+
+        }
+
+        console.log(result.length);
+        return data;
       })
 
 
@@ -133,12 +172,52 @@ findById = function(nom,data,id){
 
 }
 
+findCoordinates = function(nom,id){
+
+  return dt.Dataset.findOne({ where: { datos: {nombre:nom}  }}).then (result => {
+   console.log(JSON.stringify(result.datos.nombre));
+   var nombre= result.datos.nombre;
+   var datos=result.datos.table_data;
+   var param = result.datos.table_data.id.name;
+
+
+
+    return sequelize.query('SELECT ST_Extent(geom) FROM ' + nombre + ' WHERE '+ param +'=$id',
+      { bind: {id: id }, type: sequelize.QueryTypes.SELECT }
+    ).then(result => {
+      console.log(result[0].st_extent);
+      var datos,aux_min, aux_max, ymin, xmin, ymax, xmax;
+      var p1 = result[0].st_extent.indexOf("(");
+      var p2 = result[0].st_extent.indexOf(")");
+      var coord = [];
+      if (p1 !== -1 && p2 !== -1){
+        datos = result[0].st_extent.substring(p1+1,p2);
+        p1 = datos.indexOf(",");
+        aux_min = datos.substring(0,p1);
+        aux_max = datos.substring(p1+1);
+        p2 = aux_min.indexOf(" ");
+        xmin = aux_min.substring(0,p2);
+        ymin = aux_min.substring(p2+1);
+        p2 = aux_max.indexOf(" ");
+        xmax = aux_max.substring(0,p2);
+        ymax = aux_max.substring(p2+1);
+        coord.push({"ymin": ymin, "xmin":xmin, "ymax": ymax, "xmax": xmax });
+        console.log(coord);
+      }
+
+      return coord;
+    })
+
+
+  })
+}
 
 module.exports = {
   findAll_data,
   findByItems,
   findByData,
   TotalItems,
-  findById
+  findById,
+  findCoordinates
 
 }
