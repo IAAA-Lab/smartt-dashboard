@@ -1,14 +1,15 @@
 <template>
-  <div>
-    <header id="main-header">
-          <p>SMARTT-DASHBOARD</p>
-          <button type="button" class="btn btn-primary float-right" @click="redirigir()" style="margin-top:1%; margin-right:1%">Elegir Provincia</button>
+  <div class="wrapper">
+    <div class="well" id="main-header">SMARTT-DASHBOARD
+      <a href="/" class= "float-right" style="color: white; text-decoration: underline;" @click="redirigir()">Elegir Provincia</a>
+    </div>
 
-    </header>
+    <App v-bind:class="{ active: isActive }"></App>
 
     <div id ="info">
       <div id ="info1"> <!--widget 1 -->
-
+          <div style="text-align: center; opacity: 0.9"><font-awesome-icon icon="users" size="4x"/></div>
+        	<div style="margin-top:3%; font-size: 100%; text-align: center"><span> {{total_pob}} Habitantes </span></div>
       </div>
 
       <div id ="info2"> <!--widget 2 -->
@@ -16,82 +17,74 @@
       </div>
 
       <div id ="info3"> <!--widget 3 -->
-
+         <div style="text-align: center; opacity: 0.9"><font-awesome-icon icon="car" size="4x"/></div>
+         <div style="margin-top:3%; font-size: 100%; text-align: center"><span> {{total_turismos}} Turismos </span></div>
       </div>
       <div id ="info4"> <!--widget 3 -->
+         <div style="text-align: center; opacity: 0.9"><font-awesome-icon icon="plane" size="4x"/></div>
+         <div style="margin-top:3%; font-size: 100%; text-align: center"><span> {{aviones}} Alertas de Aviones </span></div>
 
       </div>
 
     </div>
+
     <div id="container">
-       <div id="mapa-header">
-            <p>Mapa Comunidades</p>
-       </div>
+       <div class="well well-sm" id="mapa-header"> Mapa Provincias {{prov[1]}}</div>
+
 
        <div id="map"></div>
 
        <div id="eleccion">
 
          <div class="well well-sm" style="font-weight:bold; font-size: 19px;"> Datos por provincias</div>
-         <span style="font-weight:80; margin-left:4%">Elige el año </span>
-         <div class="form-check" v-for="item in years" :key=item style="width:100%; margin:6%">
-            <input class="form-check-input" type="radio" @change="layerChanged()" v-model="year_select" name="year" id="year" :value=item style="margin:2%">
+         <span style="font-weight:80; margin-left:4%; font-size: 15px">Elige el año </span>
+         <div class="form-check" v-for="item in years" :key=item style="width:100%; margin:6%; font-size: 15px">
+            <input class="form-check-input" type="radio" @change="layerChanged(0)" v-model="year_select" name="year" id="year" :value=item style="margin:2%">
             <label class="form-check-label" for="year" style="margin-left:5%" >
               {{item}}
             </label>
 
          </div>
-         <span style="font-weight:80; margin-left:4%">Elige variable de interés</span>
-         <div class="form-check" v-for="variable in items" :key=variable style="width:100%; margin:6%">
-           <input class="form-check-input" type="radio" @change="layerChanged()" v-model="item_select" :value=variable style="margin:2%">
-           <label class="form-check-label" for="f" style="margin-left:5%" >
+         <span style="font-weight:80; margin-left:4%; font-size: 15px">Elige variable de interés</span>
+         <div class="form-check" v-for="variable in items" :key=variable style="width:100%; margin:6%; font-size: 15px">
+           <input class="form-check-input" type="radio" @change="layerChanged(1)" v-model="item_select" :value=variable style="margin:2%">
+           <label class="form-check-label" for="f" style="margin-left:5%; font-size: 15px" >
              {{variable}}
            </label>
 
          </div>
 
-         <div class="well well-sm" style="font-weight:bold; font-size: 19px;"> Municipios {{prov[1]}}</div>
-         <input type="checkbox" id="checkbox" @change="layerChanged_mun(0)" v-model="checked" style="margin:2%">
-         <label for="checkbox">Ver municipios {{prov[1]}}</label>
+         <div class="well well-sm" style="font-weight:bold;"> Municipios {{prov[1]}}</div>
+         <input type="checkbox" id="checkbox" @change="layerChanged_mun(0)" v-model="checked" style="margin-left:5%;">
+         <label for="checkbox" style="margin-left:3%; font-size: 15px; margin-top: -30px">Ver municipios </label>
 
-        {{prueba}}
        </div>
-
     </div>
 
     <div id="grafica-container">
         <div id="grafica">
           <ul class="nav nav-tabs">
-            <li class="nav-item active">
-              <a class="nav-link" data-toggle="tab" href="#p_prov">Población {{ prov[1]}}</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" data-toggle="tab" href="#v_prov">Vehiculos {{ prov[1] }}</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" data-toggle="tab" href="#comparacion">Comparar Población</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" data-toggle="tab" href="#comparacion_v">Comparar Vehículos</a>
-            </li>
-
+            <li class="active"><a data-toggle="tab" href="#p_prov">Población {{ prov[1]}}</a></li>
+            <li><a data-toggle="tab" href="#v_prov">Vehiculos {{ prov[1] }}</a></li>
+            <li><a data-toggle="tab" href="#comparacion">Comparar Población</a></li>
+            <li><a data-toggle="tab" href="#comparacion_v">Comparar Vehículos</a></li>
           </ul>
 
 
-
           <div class="tab-content">
-            <div id="p_prov" class="container tab-pane fade"><br>
-              <highcharts :options="chartOptions_prov" style="width:80%"></highcharts>
+            <div id="p_prov" class="tab-pane fade in active"><br>
+              <highcharts :options="chartOptions_prov" style="width:100%"></highcharts>
               <div class="dropdown" >
-                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="width:80%">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                style="width:100%; background:#336680; color:white; border-color: #336680; margin-top:-1%">
                   Tablas de datos
                 </button>
-                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="width:80%">
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="width:100%">
                   <button type="button" class="btn float-right" @click="descargarCSV(p_poblacion,tabla_th)" style="margin-top:1%; margin-right:1%">Descargar CSV</button>
                   <div class="table-responsive" style="margin-top:5%">
-                    <table class="table" style="margin-top:2%">
-                      <thead class="thead-dark">
-                        <tr>
+                    <table class="table table-striped" align="center" style="margin-top:2%; width:98%">
+                      <thead>
+                        <tr style="background:#52A3CC;opacity: 0.7; color:white; border:1% solid #52A3CC">
                            <th v-for="t in tabla_th">{{t}}</th>
 
                          </tr>
@@ -102,8 +95,6 @@
                                   <td v-for="i in item">{{i}}</td>
                               </tr>
                         </template>
-
-                          </tr>
                       </tbody>
                     </table>
                   </div>
@@ -112,17 +103,18 @@
             </div>
 
             <div id="v_prov" class="container tab-pane fade"><br>
-              <highcharts :options="chartOptions_v_prov" style="width:80%"></highcharts>
+              <highcharts :options="chartOptions_v_prov" style="width:100%"></highcharts>
               <div class="dropdown" >
-                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="width:80%">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                style="width:100%; background:#336680; color:white; border-color: #336680; margin-top:-1%">
                   Tablas de datos
                 </button>
-                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="width:80%">
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="width:100%">
                   <button type="button" class="btn float-right" @click="descargarCSV(p_parque,tabla_th_v)" style="margin-top:1%; margin-right:1%">Descargar CSV</button>
                   <div class="table-responsive" style="margin-top:5%">
-                    <table class="table" style="margin-top:2%">
-                     <thead class="thead-dark">
-                       <tr>
+                    <table class="table table-striped" align="center" style="margin-top:2%; width:98%">
+                     <thead>
+                       <tr style="background:#52A3CC;opacity: 0.7; color:white; border:1% solid #52A3CC">
                           <th v-for="t in tabla_th_v">{{t}}</th>
 
                         </tr>
@@ -144,20 +136,21 @@
 
             <div id="comparacion" class="container tab-pane fade"><br>
               <h5>Elige una provincia para la comparación</h5>
-              <select name="prov" id="comp_p" @change="cargar_datos_pob(prov_select_p,1)" v-model="prov_select_p" class="form-control" style="height:40px; width:80%">
+              <select name="prov" id="comp_p" @change="cargar_datos_pob(prov_select_p,1)" v-model="prov_select_p" class="form-control" style="height:40px; width:100%">
                  <option v-for="item in provincias" :value=[item.cod,item.nom]>{{item.nom}}</option>
               </select>
-              <highcharts :options="chartOptions_comp_poblacion" style="width:80%; margin-top:5%"></highcharts>
+              <highcharts :options="chartOptions_comp_poblacion" style="width:100%; margin-top:5%"></highcharts>
               <div class="dropdown" >
-                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="width:80%">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                style="width:100%; background:#336680; color:white; border-color: #336680; margin-top:-1%">
                   Tablas de datos
                 </button>
-                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="width:80%">
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="width:100%">
                   <button type="button" class="btn float-right" @click="descargarCSV(p_poblacion_c,tabla_th)" style="margin-top:1%; margin-right:1%">Descargar CSV</button>
                   <div class="table-responsive" style="margin-top:5%">
-                    <table class="table" style="margin-top:2%">
-                      <thead class="thead-dark">
-                         <tr>
+                    <table class="table table-striped" align="center" style="margin-top:2%; width:98%">
+                      <thead>
+                         <tr style="background:#52A3CC;opacity: 0.7; color:white; border:1% solid #52A3CC">
                             <th v-for="t in tabla_th">{{t}}</th>
                          </tr>
                       </thead>
@@ -179,20 +172,21 @@
 
             <div id="comparacion_v" class="container tab-pane fade"><br>
               <h5>Elige una provincia para la comparación</h5>
-              <select name="prov_v" id="comp_v" @change="cargar_datos_v(prov_select_v,1)" v-model="prov_select_v" class="form-control" style="height:40px; width:80%">
+              <select name="prov_v" id="comp_v" @change="cargar_datos_v(prov_select_v,1)" v-model="prov_select_v" class="form-control" style="height:40px; width:100%">
                  <option v-for="item in provincias" :value=[item.cod,item.nom]>{{item.nom}}</option>
               </select>
-              <highcharts :options="chartOptions_comp_vehiculos" style="width:80%;  margin-top:5%"></highcharts>
+              <highcharts :options="chartOptions_comp_vehiculos" style="width:100%;  margin-top:5%"></highcharts>
               <div class="dropdown" >
-                  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="width:80%">
+                  <button class="btn dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                  style="width:100%; background:#336680; color:white; border-color: #336680; margin-top:-1%">
                     Tablas de datos
                   </button>
-                  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="width:80%">
+                  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="width:100%">
                     <button type="button" class="btn float-right" @click="descargarCSV(p_parque_c,tabla_th_v)" style="margin-top:1%; margin-right:1%">Descargar CSV</button>
                     <div class="table-responsive" style="margin-top:5%;">
-                      <table class="table" style="margin-top:2%">
-                        <thead class="thead-dark">
-                           <tr>
+                      <table class="table table-striped" align="center" style="margin-top:2%; width:98%">
+                        <thead>
+                           <tr style="background:#52A3CC;opacity: 0.7; color:white; border:1% solid #52A3CC">
                               <th v-for="t in tabla_th_v">{{t}}</th>
                            </tr>
                         </thead>
@@ -210,17 +204,19 @@
                   </div>
                </div>
 
-
-
-
             </div>
-
 
 
 
           </div>
         </div>
-
+    </div>
+    {{prueba}}
+    <div id="footer">
+     <img src="../assets/logoUZ.png" alt="Smiley face" height="100" width="300" style="float: right">
+     <div style="text-align: left">
+      Licencia de datos
+     </div>
     </div>
 
   </div>
@@ -228,6 +224,7 @@
 
 <script>
 import { LMap, LWMSTileLayer, LControlLayers } from "vue2-leaflet";
+import { logo } from "../assets/logo.png"
 const axios = require('axios');
 require('babel-polyfill');
 export default {
@@ -280,6 +277,11 @@ export default {
                tabla_th: [],
                tabla_th_v: [],
                entrar: false,
+               total_pob: null,
+               total_turismos: null,
+               isActive: false,
+               aviones:null,
+               coordenadas: []
 
               }
 
@@ -335,8 +337,6 @@ export default {
           this.cargar_datos_pob(this.prov,0);
           this.cargar_datos_v(this.prov,0);
 
-
-
       },
       methods: {
 
@@ -358,7 +358,7 @@ export default {
 
          },
 
-         initMap(){
+         async initMap(){
 
             const map = L.map( 'map', {
                 maxZoom: 16,
@@ -387,6 +387,67 @@ export default {
                 subdomains: ['a','b','c'],
 
             },).addTo( map );
+
+            axios({
+               method: 'get',
+               url: 'http://localhost:3000/api/datasets/p_poblacion18/coordinates/'+this.prov[0]}
+            ).then(response => {
+                var coord = response.data[0];
+                var aux= [];
+                for (var item in coord){
+                  aux.push(coord[item]);
+                }
+                this.map.fitBounds([[aux[0],aux[1]],[aux[2],aux[3]]])
+                axios({
+                  method: 'get',
+                  url: 'https://maria93:e8umh8@opensky-network.org/api/states/all?lamin='+aux[0]+'&lomin='+aux[1]+'&lamax='+aux[2]+'&lomax='+aux[3]}
+                ).then(response => {
+                   var data = response.data
+                   var states = data.states;
+                   var latitud=[];
+                   var longitud=[];
+                   var origen = [];
+                   var rotacion = [];
+                   for ( var i in states){
+                     longitud.push(states[i][5]);
+                     latitud.push(states[i][6]);
+                     origen.push(states[i][2]);
+                     rotacion.push(states[i][10]);
+
+                   }
+                   this.aviones = longitud.length;
+
+                  // Icon options
+                   var iconOptions = {
+                      iconUrl: 'https://image.flaticon.com/icons/svg/723/723955.svg',
+                      iconSize: [15, 15]
+                   }
+                   // Creating a custom icon
+                   var customIcon = L.icon(iconOptions);
+
+                   // Creating Marker Options
+                   var markerOptions = {
+                      clickable: true,
+                      draggable: true,
+                      icon: customIcon
+                   }
+
+                   for ( var j in latitud){
+                       //markerOptions["rotationAngle"] = rotacion[j];
+                       //this.prueba.push(rotacion[j]);
+                       // Creating a Marker
+                       var marker = L.marker([latitud[j], longitud[j]], markerOptions).bindPopup("<i>País de Origen:</i>"+ origen[j]).addTo(map);
+                       marker.setRotationAngle(rotacion[j]);
+                   }
+                  }
+                ).catch(function (error) {
+                  console.log('Error: ' + error);
+                });
+               }
+            ).catch(function (error) {
+               console.log('Error: ' + error);
+            });
+
          },
 
          cargar_datos_dashboard(){
@@ -409,6 +470,7 @@ export default {
                  }
               }
              }
+             this.years.sort();
              for (var item in this.mapa_v_prov){
                layers = this.mapa_v_prov[item].layers;
 
@@ -462,7 +524,7 @@ export default {
 
          },
 
-         layerChanged() {
+         layerChanged(op) {
 
             var layer_legend;
             var layer_nom;
@@ -470,6 +532,53 @@ export default {
             var layer_year;
             var layers;
             var legends;
+
+            if (op=="0"){
+              this.items=[];
+              for (var item in this.mapa_prov){
+                layer_year = this.mapa_prov[item].año;
+                if (layer_year == this.year_select){
+                  layers = this.mapa_prov[item].layers;
+                  for (var j in layers){
+                     this.items.push(layers[j].name);
+                  }
+                }
+
+              }
+
+              for (var item in this.mapa_v_prov){
+                layer_year = this.mapa_v_prov[item].año;
+                if (layer_year == this.year_select){
+                  layers = this.mapa_v_prov[item].layers;
+                  for (var j in layers){
+                     this.items.push(layers[j].name);
+                  }
+                }
+
+              }
+            }
+
+            if (op==1){
+              this.years=[];
+              for (var item in this.mapa_prov){
+                layers = this.mapa_prov[item].layers;
+                for (var j in layers){
+                    if (this.item_select == layers[j].name){
+                        this.years.push(this.mapa_prov[item].año);
+                    }
+                }
+              }
+              for (var item in this.mapa_v_prov){
+                layers = this.mapa_v_prov[item].layers;
+                for (var j in layers){
+                    if (this.item_select == layers[j].name){
+                        this.years.push(this.mapa_v_prov[item].año);
+                    }
+                }
+              }
+
+              this.years.sort();
+            }
 
             if (this.year_select && this.item_select ){
 
@@ -510,7 +619,6 @@ export default {
                   }
 
                 }
-
                 const wmsLayer= L.tileLayer.wms("http://localhost:8081/geoserver/Comarcas/wms?", {
                     layers: layer_title,
                     format: 'image/png',
@@ -537,7 +645,8 @@ export default {
                   onAdd: function (map) {
                    var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
                    container.innerHTML +='<div style="background:#D1D1D1"> <span>Datos de las provincias</span>';
-                   container.innerHTML +='<img alt="legend" src='+layer_legend+' />';
+                   container.innerHTML +='</div>'
+                   container.innerHTML +='<div style="background:white"><img alt="legend" src='+layer_legend+' />';
                    container.innerHTML +='</div>'
 
                    return container;
@@ -629,7 +738,8 @@ export default {
                 onAdd: function (map) {
                  var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
                  container.innerHTML +='<div style="background:#D1D1D1"> <span>Datos de los municipios</span>';
-                 container.innerHTML +='<img alt="legend" src='+layer_legend+' />';
+                 container.innerHTML +='</div>'
+                 container.innerHTML +='<div style="background:white"><img alt="legend" src='+layer_legend+' />';
                  container.innerHTML +='</div>'
                  return container;
                 },
@@ -670,8 +780,13 @@ export default {
              var data;
              var idx;
              var item_aux;
+             this.p_poblacion_c = [];
 
-             for (serie in this.series_comp_poblacion){
+             for (var item in this.p_poblacion){
+                this.p_poblacion_c.push(this.p_poblacion[item]);
+             }
+
+             for (var serie in this.series_comp_poblacion){
                if (serie>(this.series_comp_poblacion.length/2)-1){
                  this.series_comp_poblacion[serie].data = [];
                }
@@ -726,6 +841,11 @@ export default {
                  if (aux == 0){
                    this.p_poblacion.push(data);
                    this.p_poblacion_c.push(data);
+                   for (var item in this.p_poblacion){
+                      if (this.p_poblacion[item].año == this.years[this.years.length-1]){
+                          this.total_pob = this.p_poblacion[item].total
+                      }
+                   }
                  }
                  else{
                     this.p_poblacion_c.push(data);
@@ -743,12 +863,17 @@ export default {
             var data;
             var idx;
 
-            for (serie in this.series_comp_vehiculos){
+            this.p_parque_c = [];
+
+            for (var item in this.p_parque){
+               this.p_parque_c.push(this.p_parque[item]);
+            }
+
+            for (var serie in this.series_comp_vehiculos){
               if (serie>(this.series_comp_vehiculos.length/2)-1){
                 this.series_comp_vehiculos[serie].data = []
               }
             }
-
 
             for (var item in this.mapa_v_prov){
                  dataset = this.mapa_v_prov[item].dataset;
@@ -799,6 +924,11 @@ export default {
                 if (aux == 0){
                   this.p_parque.push(data);
                   this.p_parque_c.push(data);
+                  for (var item in this.p_parque){
+                     if (this.p_parque[item].año == this.years[this.years.length-1]){
+                         this.total_turismos = this.p_parque[item].turismos;
+                     }
+                  }
                 }
                 else{
                    this.p_parque_c.push(data);
@@ -836,12 +966,10 @@ export default {
           document.body.appendChild(link);
           link.click()
          },
-         redirigir(){
-          this.$router.push({
-             name: 'App',
-          });
 
-         }
+         redirigir(){
+          this.isActive= true;
+         },
 
       }
   }
@@ -850,46 +978,59 @@ export default {
 <style>
 
 #main-header {
-  background: #333;
+  background: #336680;
   color: white;
-  height: 40px;
-  vertical-align: middle;
-  font-weight: 700;
-  font-size: 1.2em;
-  font-margin: 10px;
+  font-family: Montserrat;
+  font-size: 17px;
+  font-weight: bold;
 
 }
+.wrapper {
+  min-height: 100%;
+  height: auto;
+  height: 170%;
+  margin: 0 auto -4em;
+}
+#footer {
+  height: 5%;
+  position:absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: 1rem;
+  background-color: #52A3CC;
 
+}
 #container{
 
-  width: 50%;
-  height:700px;
+  width: 60%;
+  height:750px;
   display: flex;
   margin: auto;
   position:relative;
-
+  font-family: Montserrat;
+  font-size: 16px;
 
 }
 
 #mapa-header{
 
-  background: #333;
+  background: #336680;
   width:100%;
-  height:5%;
   color:white;
-  padding:0.5%;
-  float:top;
+  font-weight:bold;
+  font-size: 19px;
 
 }
 
 
 #map{
 
-  height: 95%;
-  width:80%;
+  height: 100%;
+  width:75%;
   border: 1px solid #AAA;
   position:absolute;
-  top:5%;
+  top:6%;
   left:0;
 
 
@@ -897,23 +1038,25 @@ export default {
 
 #eleccion{
 
-  width:20%;
-  height:95%;
+  width:25%;
+  height: 100%;
   background: white;
   border: 1px solid #AAA;
   position:absolute;
-  top:5%;
+  top:6%;
   right:0;
 }
 
 #grafica-container{
 
-   width: 50%;
+   width: 60%;
    height:700px;
    display: flex;
    margin: -3% auto;
    margin-top: 3%;
    position:relative;
+   font-family: Montserrat;
+   font-size: 16px;
 
 
 }
@@ -924,6 +1067,8 @@ export default {
   position:absolute;
   margin-top:3%;
   top:5%;
+  font-family: Montserrat;
+  font-size: 16px;
 
 }
 
@@ -941,51 +1086,59 @@ export default {
 
 #info1{
 
-    padding: 15px;
-    margin: 15px;
-    background: #333;
+    padding: 1%;
+    margin: 1%;
+    background: #085780;
     color: white;
     height: 100%;
     width: 15%;
     border-radius: 10px;
     float:left;
     display: inline-block;
+    font-family: Montserrat;
+    font-size: 16px;
 }
 #info2{
 
-    padding: 15px;
-    margin: 15px;
-    background: #288EEA;
+    padding: 1%;
+    margin: 1%;
+    background: #66CCFF;
     color: white;
     height: 100%;
     width: 15%;
     border-radius: 10px;
     float:left;
     display: inline-block;
+    font-family: Montserrat;
+    font-size: 16px;
 }
 #info3{
 
-    padding: 15px;
-    margin: 15px;
-    background: #5B5B5F;
+    padding: 1%;
+    margin: 1%;
+    background: #52A3CC;
     color: white;
     height: 100%;
     width: 15%;
     border-radius: 10px;
     float:left;
     display: inline-block;
+    font-family: Montserrat;
+    font-size: 16px;
 }
 #info4{
 
-    padding: 15px;
-    margin: 15px;
-    background: #A01127;
+    padding: 1%;
+    margin: 1%;
+    background: #336680;
     color: white;
     height: 100%;
     width: 15%;
     border-radius: 10px;
     float:left;
     display: inline-block;
+    font-family: Montserrat;
+    font-size: 16px;
 }
 
 </style>

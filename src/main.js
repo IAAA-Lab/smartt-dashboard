@@ -7,14 +7,18 @@ import App from './App.vue'
 import * as Vue2Leaflet from 'vue2-leaflet'
 import {LMap,LTitleLayer,LMarker} from 'vue2-leaflet'
 import "leaflet.icon.glyph";
+import "leaflet-rotatedmarker";
 import { Icon } from "leaflet";
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { faUsers, faCar, faPlane } from '@fortawesome/free-solid-svg-icons'
 
 
-
+library.add(faUsers,faCar,faPlane)
 
 Vue.use(HighchartsVue.default)
 Vue.component('v-select', VueSelect.VueSelect);
-
+Vue.component('font-awesome-icon', FontAwesomeIcon);
 
 
 delete Icon.Default.prototype._getIconUrl;
