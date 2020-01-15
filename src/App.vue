@@ -26,6 +26,7 @@
                 <a href="#" data-dismiss="modal" class="btn" style="background:#336680; color: white" @click="redirigir(mun_select)">Aceptar</a>
                </div>
           </div>
+          {{prueba}}
        </div>
     </div>
 
@@ -48,14 +49,11 @@ export default {
            municipios: [],
            prov_select: [],
            mun_select: [],
-           datos_prov_mapa: [],
-           datos_mun_mapa: [],
-           datos_v_prov_mapa: [],
-           datos_v_mun_mapa: [],
-           datos: [],
-           years_prov: [],
-           years_mun: [],
-           data: []
+           dashboard_1: [],
+           dashboard_2: [],
+           datos_d1:[],
+
+           prueba:[]
 
           }
 
@@ -63,7 +61,6 @@ export default {
 
   mounted(){
       this.cargarProvincias();
-      this.cargarDatosMapa();
       $(document).ready(function()
             {
                $("#mostrarmodal").modal("show");
@@ -87,97 +84,6 @@ export default {
           }
         ).catch(function (error) {
           console.log('Error: ' + error);
-        });
-
-      },
-
-      cargarDatosMapa(){
-        this.datos_prov_mapa=[];
-        this.datos_mun_mapa=[];
-        var idx;
-        var idy;
-        var aux;
-        var urls = [];
-        var results=[];
-
-        axios({
-           method: 'get',
-           url: 'http://localhost:3000/api/dashboard'}
-        ).then(response => {
-            var data = response.data
-           for(var key in data){
-             this.datos.push({"nombre": data[key].datos.nombre, "año": data[key].datos.año});
-           }
-           for (var item in this.datos){
-               aux = this.datos[item].nombre;
-
-               idx = aux.indexOf("p_");
-               idy = this.years_prov.indexOf((this.datos[item].año).substring(2,4));
-               if (idx !== -1 && idy == -1){
-                this.years_prov.push((this.datos[item].año).substring(2,4));
-               }
-               idx = aux.indexOf("m_");
-               idy = this.years_mun.indexOf((this.datos[item].año).substring(2,4));
-               if (idx !== -1 && idy == -1){
-                this.years_mun.push((this.datos[item].año).substring(2,4));
-               }
-
-
-           }
-           this.years_prov.sort();
-           this.years_mun.sort();
-
-           for (var i in this.years_prov){
-             axios({
-                method: 'get',
-                url: 'http://localhost:3000/api/dashboard/name/p_poblacion'+this.years_prov[i]}
-             ).then(response => {
-                 var data = response.data
-                 this.datos_prov_mapa.push(data.datos);
-                }
-             ).catch(function (error) {
-                console.log('Error: ' + error);
-             });
-
-             axios({
-                method: 'get',
-                url: 'http://localhost:3000/api/dashboard/name/p_parque'+this.years_prov[i]}
-             ).then(response => {
-                 var data = response.data
-                 this.datos_v_prov_mapa.push(data.datos);
-                }
-             ).catch(function (error) {
-                console.log('Error: ' + error);
-             });
-           }
-
-           for (var i in this.years_mun){
-              axios({
-                 method: 'get',
-                 url: 'http://localhost:3000/api/dashboard/name/m_poblacion'+this.years_mun[i]}
-              ).then(response => {
-                  var data = response.data
-                  this.datos_mun_mapa.push(data.datos)
-                 }
-              ).catch(function (error) {
-                 console.log('Error: ' + error);
-              });
-
-              axios({
-                 method: 'get',
-                 url: 'http://localhost:3000/api/dashboard/name/m_parque'+this.years_mun[i]}
-              ).then(response => {
-                  var data = response.data
-                  this.datos_v_mun_mapa.push(data.datos)
-                 }
-              ).catch(function (error) {
-                 console.log('Error: ' + error);
-              });
-           }
-
-        }
-        ).catch(function (error) {
-           console.log('Error: ' + error);
         });
 
       },
@@ -212,7 +118,7 @@ export default {
 
               this.$router.push({
                  name: 'Provincias',
-                 params: { "prov": prov, "mapa_prov": this.datos_prov_mapa, "mapa_mun": this.datos_mun_mapa, "mapa_v_prov": this.datos_v_prov_mapa, "mapa_v_mun": this.datos_v_mun_mapa}
+                 params: { "nom_dashboard": "provincias", "prov": prov}
               });
 
         }
@@ -220,7 +126,7 @@ export default {
 
               this.$router.push({
                  name: 'Municipios',
-                 params: { "mun": mun, "mapa_mun": this.datos_mun_mapa,"mapa_v_mun": this.datos_v_mun_mapa}
+                 params: { "nom_dashboard": "municipios", "mun": mun}
               });
 
         }

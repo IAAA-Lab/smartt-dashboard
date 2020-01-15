@@ -38,6 +38,22 @@ findByYear_dataset = function(year){
    return Dataset.findAll({ where: { datos: {año:year}  }}).then (result => {return result})
 }
 
+findByData_dataset = function(nom,data){
+   return Dataset.findOne({ where: { datos: {nombre:nom}  }}).then (result => {
+       var datos= result.datos;
+       var res;
+       for(var key in datos){
+          if (key == data){
+            res = datos[key];
+
+          }
+       }
+       console.log(result);
+
+        return res;
+
+   })
+}
 
 
 module.exports = {
@@ -46,5 +62,6 @@ module.exports = {
   findById_dataset,
   findByName_dataset,
   findByYear_dataset,
+  findByData_dataset
 
 }

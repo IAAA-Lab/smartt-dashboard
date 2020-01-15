@@ -67,6 +67,19 @@ function getCoordinates(request, response){
 
 }
 
+function getDataMapa(request, response){
+  Dataset.findByData_dataset(request.params.id, request.params.name_data)
+    .then(prov => response.status(200).send(JSON.stringify(prov)));
+
+}
+
+
+function getItemsByData(request, response){
+  Dataset_queries.findItemsByData(request.params.id, request.params.id_data)
+    .then(prov => response.status(200).send(JSON.stringify(prov)));
+
+}
+
 
 module.exports = {
   getDataset,
@@ -78,5 +91,7 @@ module.exports = {
   getDataByParams,
   getTotalByItems,
   getDataById,
-  getCoordinates
+  getCoordinates,
+  getDataMapa,
+  getItemsByData
 }

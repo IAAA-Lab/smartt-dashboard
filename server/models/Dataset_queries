@@ -57,6 +57,7 @@ findByData = function(nom,data){
      {
      	if (key == data){
      	  param = datos[key].name;
+     	  console.log(param);
      	}
 
      }
@@ -129,7 +130,6 @@ findById = function(nom,data,id){
       var params=[];
       var d=[];
       var year= result.datos.año;
-
 
      for(var key in datos)
      {
@@ -212,12 +212,42 @@ findCoordinates = function(nom,id){
   })
 }
 
+findItemsByData = function(nom,id){
+
+   return dt.Dataset.findOne({ where: { datos: {nombre:nom}  }}).then (result => {
+     console.log(JSON.stringify(result.datos.nombre));
+      var nombre= result.datos.nombre;
+      var datos=result.datos.table_data;
+      var param = datos.id.name;
+      var params=[];
+
+     for(var k in datos.items)
+     {
+        params.push(k);
+        console.log(params);
+
+     }
+
+
+      return sequelize.query('SELECT '+ params.join(',') + ' FROM ' + nombre + ' WHERE '+ param +'=$id',
+        { bind: {id: id }, type: sequelize.QueryTypes.SELECT }
+      ).then(result => {
+
+        return result;
+      })
+
+
+   })
+
+}
+
 module.exports = {
   findAll_data,
   findByItems,
   findByData,
   TotalItems,
   findById,
-  findCoordinates
+  findCoordinates,
+  findItemsByData
 
 }

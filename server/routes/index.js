@@ -6,7 +6,7 @@ const dashboard_controller = require('../controllers/dashboard_controller')
 
 
 router.get('/', (req, res) => res.status(200).send({
-      message: 'Welcome to the BookStore API!',
+      message: 'Welcome to the API!',
     }));
 
 router.get('/datasets', dataset_controller.getDataset);
@@ -20,11 +20,13 @@ router.get('/datasets/:id/data/:name_data', dataset_controller.getDataByParams);
 router.get('/datasets/:id/total_item/:name_item', dataset_controller.getTotalByItems);
 router.get('/datasets/:id/data/:name_data/:id_data', dataset_controller.getDataById);
 router.get('/datasets/:id/coordinates/:id_data', dataset_controller.getCoordinates);
+router.get('/datasets/:id/:name_data', dataset_controller.getDataMapa);
+router.get('/datasets/:id/items/:id_data', dataset_controller.getItemsByData);
+
 
 router.get('/dashboard', dashboard_controller.getDashboard);
 router.get('/dashboard/id/:id', dashboard_controller.getDashboardById);
 router.get('/dashboard/name/:name', dashboard_controller.getDashboardByName);
-router.get('/dashboard/year/:year', dashboard_controller.getDashboardByYear);
 
 router.get('/dashboard/:id/data/:name_data', dashboard_controller.getDataDashboard);
 

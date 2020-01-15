@@ -32,11 +32,6 @@ findByName_dashboard = function(nom){
    return Dashboard.findOne({ where: { datos: {nombre:nom}  }}).then (result => {return result})
 }
 
-
-findByYear_dashboard = function(year){
-   return Dashboard.findAll({ where: { datos: {año:year}  }}).then (result => {return result})
-}
-
 findByData_dashboard = function(nom,data){
    return Dashboard.findOne({ where: { datos: {nombre:nom}  }}).then (result => {
        var datos = result.datos;
@@ -48,7 +43,7 @@ findByData_dashboard = function(nom,data){
            	  param = datos[key];
            	}
            }
-
+       console.log(param);
        return param;
 
      })
@@ -60,7 +55,6 @@ module.exports = {
   findAll_dashboard,
   findById_dashboard,
   findByName_dashboard,
-  findByYear_dashboard,
   findByData_dashboard
 
 }
