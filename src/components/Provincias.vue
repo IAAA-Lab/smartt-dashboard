@@ -66,7 +66,7 @@
             <li
               v-for="(item,index) in secciones_grafica"
               v-bind:class="{'active' : index === currentSelected}"
-              @click="selectTab(index)">
+              @click="selectTab(index),cargar_datos_graficas_aux(item)">
 
               <a data-toggle="tab">{{item }} {{prov[1]}} </a>
             </li>
@@ -90,7 +90,7 @@
                   <highcharts v-if="chart.title.text==item" :options="chart" style="width:100%"></highcharts>
                 </div>
                 <div class="dropdown" >
-                  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" @click="cargar_datos_tabla(item,prov)" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" @click="cargar_datos_tabla(item,provincias_s)" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
                   style="width:100%; background:#336680; color:white; border-color: #336680; margin-top:-2%">
                     Tablas de datos
                   </button>
@@ -218,6 +218,9 @@ export default {
                tabla_th: [],
                datos: [],
                patrones_tabla: [],
+               datos_tabla:[],
+               provincias_s:[],
+               veces_tabla: 0,
 
               }
 
@@ -620,6 +623,9 @@ export default {
             }
          },
          async cargar_datos_grafica(prov){
+
+              this.provincias_s.push(this.prov);
+
               var years=[];
               var patrones
               axios({
@@ -757,13 +763,14 @@ export default {
 
                       if (nom_chart == seccion_i){
                         for (var x in datos_i){
-                            var name_s = x
+                            var name_s = x;
+                            if (name_s.indexOf("_") !==-1){
+                              name_s = name_s.replace("_"," ");
+                            }
+
                             if (seccion_i.indexOf("c_") !==-1){
                                 if (items_comp.indexOf(x) == -1){
                                   items_comp.push(x);
-                                  if (name_s.indexOf("_") !==-1){
-                                    name_s = name_s.replace("_"," ");
-                                  }
 
                                   chart_op.series.push({name: name_s +" "+ prov[1], title:x, data:[]})
 
@@ -781,13 +788,13 @@ export default {
                                 if (items.indexOf(x) == -1){
                                   items.push(x);
 
-                                  chart_op.series.push({name: x+" "+ prov[1], title:x, data:[]})
+                                  chart_op.series.push({name: name_s+" "+ prov[1], title:x, data:[]})
 
                                 }
                                 var chart_series = chart_op.series
 
                                 for (var series in chart_series){
-                                  if (chart_series[series].name == x +" "+ prov[1]){
+                                  if (chart_series[series].name == name_s +" "+ prov[1]){
                                     chart_series[series].data.push(parseInt(datos_i[x]))
                                   }
                                 }
@@ -811,6 +818,7 @@ export default {
               var results=[];
 
               this.items_comp = [];
+
 
               if (item !== item_anterior){
                 this.veces = 0;
@@ -839,6 +847,7 @@ export default {
                          while(array.length > long/2){
                           array.pop();
                          }
+
                      }
 
                     for(var patron in this.patrones_grafica){
@@ -861,8 +870,6 @@ export default {
                                 var data = datos_result.data[0];
                                 var chart_series = chart_op.series
 
-
-                                //this.prueba.push(data);
                                 for (var d in data){
                                   //this.prueba.push(d+"-"+data[d]);
                                   var name_s = d;
@@ -898,62 +905,81 @@ export default {
 
                this.item_select_anterior = item;
                this.veces = this.veces +1;
+               this.provincias_s.push(this.prov_select);
                this.prov_select = null;
-               cargar_datos_tabla(item, prov);
+
          },
 
          async cargar_datos_tabla(item, prov){
 
-             var urls = [];
-             var results = [];
+            var urls = [];
+            var results = [];
 
 
-
-             for (var patron in this.patrones_tabla){
-                 var patrones = this.patrones_tabla[patron];
-                 var seccion = patrones["seccion"];
-                 var patrones_s = patrones["patron"];
-
-                 if (seccion.indexOf(item) !==-1){
-                     this.tabla_th = [];
-                      this.datos_tabla = [];
-                     for(var p in patrones_s){
-                         var patron_p = patrones_s[p];
-                         urls.push('http://localhost:3000/api/datasets/'+patron_p+'/data/id/'+prov[0]);
-
-                     }
-                      results = await axios.all(urls.map(x => axios.get(x)));
-                      //this.prueba.push(results)
-                      var datos_result;
-
-                      for (var i=0; i<results.length; i++){
-                           var datos_result = results[i].data;
-                           for (var d in datos_result){
-                             var datos_d = datos_result[d];
-                             for (var datos in datos_d){
-                               if (this.tabla_th.indexOf(datos) == -1){
-                                 this.tabla_th.push(datos);
-
-                               }
-
-                             }
-                             this.datos_tabla.push(datos_d);
+            for (var provincias in prov){
+                this.prueba.push(prov[provincias]);
+                var provincias = prov[provincias]
 
 
-                           }
+               for (var patron in this.patrones_tabla){
+                   var patrones = this.patrones_tabla[patron];
+                   var seccion = patrones["seccion"];
+                   var patrones_s = patrones["patron"];
+
+                   if(item.indexOf(" ") !==-1){
+                      item = item.split(" ");
+                      item = item[1];
+
+                   }
+
+                   if (seccion.indexOf(item) !==-1){
+                       this.prueba.push(item);
+                       this.tabla_th = [];
+                        this.datos_tabla = [];
+                       for(var p in patrones_s){
+                           var patron_p = patrones_s[p];
+                           urls.push('http://localhost:3000/api/datasets/'+patron_p+'/data/id/'+provincias[0]);
 
                        }
+                        results = await axios.all(urls.map(x => axios.get(x)));
 
-                 }
+                        var datos_result;
+
+                        for (var i=0; i<results.length; i++){
+                             var datos_result = results[i].data;
+                             for (var d in datos_result){
+                               var datos_d = datos_result[d];
+                               for (var datos in datos_d){
+                                 if (this.tabla_th.indexOf(datos) == -1){
+                                   this.tabla_th.push(datos);
+
+                                 }
+
+                               }
+                               this.datos_tabla.push(datos_d);
 
 
-             }
+                             }
+
+                         }
+
+                   }
+
+
+               }
+            }
+            if (this.provincias_s.length>1){
+              this.provincias_s.pop();
+
+            }
 
 
 
+         },
 
+         cargar_datos_graficas_aux(item){
 
-
+              this.prueba.push(item);
 
          },
 
