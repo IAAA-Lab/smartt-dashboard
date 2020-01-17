@@ -66,7 +66,7 @@
             <li
               v-for="(item,index) in secciones_grafica"
               v-bind:class="{'active' : index === currentSelected}"
-              @click="selectTab(index),cargar_datos_graficas_aux(item)">
+              @click="selectTab(index),resetear_datos_grafica(item)">
 
               <a data-toggle="tab">{{item }} {{prov[1]}} </a>
             </li>
@@ -221,6 +221,7 @@ export default {
                datos_tabla:[],
                provincias_s:[],
                veces_tabla: 0,
+               seccion_select:null,
 
               }
 
@@ -353,7 +354,9 @@ export default {
                ).then(response => {
                   var data = response.data
                   for(var key in data){
-                    this.provincias.push({"cod": data[key].cod, "nom": data[key].nom});
+                    if (data[key].nom !== this.prov[1]){
+                      this.provincias.push({"cod": data[key].cod, "nom": data[key].nom});
+                    }
                   }
 
                  }
@@ -833,19 +836,18 @@ export default {
 
                   if (item !== item_anterior){
                     this.veces = 0;
-                    if (title_chart == item_anterior){
-                       while(array.length > long/2){
-                        array.pop();
-                       }
 
-                    }
                   }
 
                   if (title_chart == item){
-
+                     this.seccion_select = title_chart;
                      if(this.veces>0){
                          while(array.length > long/2){
                           array.pop();
+                         }
+                         if (this.provincias_s.length>1){
+                           this.provincias_s.pop();
+
                          }
 
                      }
@@ -968,18 +970,39 @@ export default {
 
                }
             }
-            if (this.provincias_s.length>1){
-              this.provincias_s.pop();
 
-            }
 
 
 
          },
 
-         cargar_datos_graficas_aux(item){
+         resetear_datos_grafica(item){
 
-              this.prueba.push(item);
+              if (this.seccion_select !==null && this.provincias_s.length>1){
+                  for (var chart in this.chartOp){
+                      var chart_op = this.chartOp[chart];
+                      var title_chart = chart_op.title.text;
+                      var nom_chart = chart_op.name;
+                      var array = chart_op.series;
+                      var long = array.length;
+
+
+                      if (title_chart == this.seccion_select){
+
+                         while(array.length > long/2){
+                          array.pop();
+                         }
+                         this.veces = 0;
+
+
+                      }
+                  }
+                  this.seccion_select= null;
+                  this.provincias_s.pop();
+
+              }
+
+
 
          },
 
