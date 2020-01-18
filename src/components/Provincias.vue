@@ -9,16 +9,17 @@
     <div id ="info">
       <div id ="info1"> <!--widget 1 -->
           <div style="text-align: center; opacity: 0.9"><font-awesome-icon icon="users" size="4x"/></div>
-        	<div style="margin-top:3%; font-size: 100%; text-align: center"><span> {{total_pob}} Habitantes </span></div>
+        	<div style="margin-top:3%; font-size: 100%; text-align: center"><span> {{widget[0]}} Habitantes </span></div>
       </div>
 
       <div id ="info2"> <!--widget 2 -->
-
+          <div style="text-align: center; opacity: 0.9"><font-awesome-icon icon="car" size="4x"/></div>
+          <div style="margin-top:3%; font-size: 100%; text-align: center"><span> {{widget[1]}} Turismos </span></div>
       </div>
 
       <div id ="info3"> <!--widget 3 -->
-         <div style="text-align: center; opacity: 0.9"><font-awesome-icon icon="car" size="4x"/></div>
-         <div style="margin-top:3%; font-size: 100%; text-align: center"><span> {{total_turismos}} Turismos </span></div>
+         <div style="text-align: center; opacity: 0.9"><font-awesome-icon icon="tree" size="4x"/></div>
+         <div style="margin-top:3%; font-size: 100%; text-align: center"><span> {{widget[2]}} Deforestacion </span></div>
       </div>
       <div id ="info4"> <!--widget 3 -->
          <div style="text-align: center; opacity: 0.9"><font-awesome-icon icon="plane" size="4x"/></div>
@@ -54,7 +55,7 @@
 
          <div class="well well-sm" style="font-weight:bold;"> {{secciones_mapa[1]}} {{prov[1]}}</div>
          <input type="checkbox" id="checkbox" @change="layerChanged_mun(0)" v-model="checked" style="margin-left:5%;">
-         <label for="checkbox" style="margin-left:3%; font-size: 15px; margin-top: -30px">Ver {{secciones_mapa[1]}} </label>
+         <label for="checkbox" style="margin-left:3%; font-size: 15px; margin-top: 1%">Ver {{secciones_mapa[1]}} </label>
 
        </div>
     </div>
@@ -222,6 +223,7 @@ export default {
                provincias_s:[],
                veces_tabla: 0,
                seccion_select:null,
+               widget: [],
 
               }
 
@@ -236,6 +238,7 @@ export default {
       },
       mounted(){
           this.initMap();
+          this.cargar_datos_widget();
           this.cargar_datos_dashboard();
           this.cargar_datos_grafica(this.prov);
 
@@ -260,6 +263,86 @@ export default {
 
             },).addTo( map );
 
+         },
+
+         cargar_datos_widget(){
+
+             axios({
+               method: 'get',
+               url: 'http://localhost:3000/api/dashboard/name/TFG'}
+             ).then(response => {
+                var data = response.data.datos.dashboards;
+                var secciones_widget = [];
+                var seccion;
+
+                for (var key in data){
+                      var seccion = key.charAt(0).toUpperCase() + key.substring(1 , key.length).toLowerCase();
+                      secciones_widget.push(seccion);
+                      if (key == this.nom_dashboard){
+                        var data_key = data[key];
+                        for (var i in data_key){
+                          var data_i = data_key[i];
+                          var years = data_i["años"];
+                          var year_aux = years.split("-");
+                          var year = year_aux[1].substring(year_aux[1].length, year_aux[1].length -2);
+                          var patron = data_i["patron"];
+                          var patron_year = patron.replace("XX", year);
+
+                          axios({
+                             method: 'get',
+                             url: 'http://localhost:3000/api/datasets/'+patron_year+'/items/'+this.prov[0]}
+                           ).then(response => {
+                              var data = response.data
+                              var suma = 0;
+                              var dato = [];
+                              for(var key in data){
+
+                                  var data_key = data[key];
+
+                                  dato = []
+
+                                  var cont = 0;
+                                   for (var j in data_key){
+
+
+                                      suma = suma + parseInt(data_key[j]);
+
+                                      cont = cont + 1;
+                                      dato.push(data_key[j]);
+                                   }
+
+
+                                 if (cont == 2){
+                                     this.widget.push(suma);
+                                 }
+
+                                 if (cont <2){
+                                    this.widget.push(dato[0]);
+                                 }
+                                 if (cont >2){
+                                    this.widget.push(dato[2]);
+
+                                 }
+
+
+
+
+
+                              }
+
+                             }
+                           ).catch(function (error) {
+                             console.log('Error: ' + error);
+                           });
+
+                        }
+                      }
+                 }
+
+             }
+             ).catch(function (error) {
+                console.log('Error: ' + error);
+             });
          },
 
          cargar_datos_dashboard(){
@@ -937,7 +1020,7 @@ export default {
                    if (seccion.indexOf(item) !==-1){
                        this.prueba.push(item);
                        this.tabla_th = [];
-                        this.datos_tabla = [];
+                       this.datos_tabla = [];
                        for(var p in patrones_s){
                            var patron_p = patrones_s[p];
                            urls.push('http://localhost:3000/api/datasets/'+patron_p+'/data/id/'+provincias[0]);
@@ -952,13 +1035,19 @@ export default {
                              for (var d in datos_result){
                                var datos_d = datos_result[d];
                                for (var datos in datos_d){
-                                 if (this.tabla_th.indexOf(datos) == -1){
+                                 if (this.tabla_th.indexOf(datos) == -1 && datos !=="geom"){
                                    this.tabla_th.push(datos);
 
                                  }
 
+
                                }
-                               this.datos_tabla.push(datos_d);
+
+
+                                this.datos_tabla.push(datos_d);
+
+
+
 
 
                              }

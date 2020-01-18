@@ -11,10 +11,10 @@ import "leaflet-rotatedmarker";
 import { Icon } from "leaflet";
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faUsers, faCar, faPlane } from '@fortawesome/free-solid-svg-icons'
+import { faUsers, faCar, faPlane, faTree} from '@fortawesome/free-solid-svg-icons'
 
 
-library.add(faUsers,faCar,faPlane)
+library.add(faUsers,faCar,faPlane, faTree)
 
 Vue.use(HighchartsVue.default)
 Vue.component('v-select', VueSelect.VueSelect);

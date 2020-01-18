@@ -51,7 +51,7 @@ findByData = function(nom,data){
      var nombre = result.datos.nombre;
      var datos = result.datos.table_data;
      var param;
-     var param1 = datos.name.name;
+     var param1 = datos.id.name;
 
      for(var key in datos)
      {
@@ -67,27 +67,15 @@ findByData = function(nom,data){
         console.log(param1);
      }
 
+     if (data=='id'){
+        param1 = datos.name.name;
+     }
+
      return sequelize.query('SELECT ' + param1 + ','+ param +' FROM ' + nombre + ' ORDER BY '+ param  ,
        { type: sequelize.QueryTypes.SELECT }
      ).then(result => {
-        var data = []
-        var datos;
 
-        for (var i=0; i<result.length; i++){
-            console.log(result[i]);
-            datos = result[i];
-            if (result[i].nom!=null){
-              data.push(datos);
-            }
-             if (result[i].name!=null){
-              data.push(datos);
-            }
-
-        }
-
-
-        console.log(result.length);
-        return data;
+        return result;
      })
 
    })
@@ -179,10 +167,10 @@ findCoordinates = function(nom,id){
    var nombre= result.datos.nombre;
    var datos=result.datos.table_data;
    var param = result.datos.table_data.id.name;
+   var geom = result.datos.mapa.geom.name;
 
 
-
-    return sequelize.query('SELECT ST_Extent(geom) FROM ' + nombre + ' WHERE '+ param +'=$id',
+    return sequelize.query('SELECT ST_Extent('+geom+') FROM ' + nombre + ' WHERE '+ param +'=$id',
       { bind: {id: id }, type: sequelize.QueryTypes.SELECT }
     ).then(result => {
       console.log(result[0].st_extent);
