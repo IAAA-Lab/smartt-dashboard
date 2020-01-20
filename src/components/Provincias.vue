@@ -224,6 +224,7 @@ export default {
                veces_tabla: 0,
                seccion_select:null,
                widget: [],
+               marker: [],
 
               }
 
@@ -241,6 +242,8 @@ export default {
           this.cargar_datos_widget();
           this.cargar_datos_dashboard();
           this.cargar_datos_grafica(this.prov);
+          this.cargar_datos_aviones();
+          //setInterval(this.cargar_datos_aviones(), 10);
 
       },
       methods: {
@@ -262,6 +265,124 @@ export default {
                 subdomains: ['a','b','c'],
 
             },).addTo( map );
+
+         },
+
+         cargar_datos_aviones() {
+
+            if (this.marker != []){
+              for (var m in this.marker){
+                  this.map.removeLayer(this.marker[m]);
+              }
+
+            }
+
+
+             axios({
+                method: 'get',
+                url: 'http://localhost:3000/api/dashboard/name/TFG'}
+              ).then(response => {
+                 var data = response.data.datos.dashboards
+                 for (var key in data){
+                      var seccion = key.charAt(0).toUpperCase() + key.substring(1 , key.length).toLowerCase();
+                      this.secciones_mapa.push(seccion);
+                      if (key == this.nom_dashboard){
+                        this.datos_dashboard.push(data[key]);
+                      }
+
+                 }
+                 var datos = this.datos_dashboard[0];
+                 var cont = 0;
+                 var year_min, year_max;
+
+                 for (var i in datos){
+                    var dataset = datos[i];
+                    var rango_y = dataset["años"];
+                    var years = rango_y.split("-");
+                    var last_year = years[1];
+
+                    var year = last_year.substring(last_year.length, last_year.length -2)
+                 }
+
+
+                 var d = this.patrones[0].replace("XX", year);
+
+                  axios({
+                     method: 'get',
+                     url: 'http://localhost:3000/api/datasets/'+d+'/coordinates/'+this.prov[0]}
+                  ).then(response => {
+                      var coord = response.data[0];
+                      var aux= [];
+                      for (var item in coord){
+                        aux.push(coord[item]);
+                      }
+
+                      axios({
+                         method: 'get',
+                         url: 'https://maria93:e8umh8@opensky-network.org/api/states/all?lamin='+aux[0]+'&lomin='+aux[1]+'&lamax='+aux[2]+'&lomax='+aux[3]}
+                       ).then(response => {
+                          var data = response.data
+                          var states = data.states;
+                          var latitud=[];
+                          var longitud=[];
+                          var origen = [];
+                          var tipo = [];
+                          var rotacion = [];
+                          for ( var i in states){
+                            longitud.push(states[i][5]);
+                            latitud.push(states[i][6]);
+                            origen.push(states[i][2]);
+                            rotacion.push(states[i][10]);
+                            tipo.push(states[i][1]);
+
+                          }
+                          this.aviones = longitud.length;
+
+                         // Icon options
+                          var iconOptions = {
+                             iconUrl: 'https://image.flaticon.com/icons/svg/723/723955.svg',
+                             iconSize: [15, 15]
+                          }
+                          // Creating a custom icon
+                          var customIcon = L.icon(iconOptions);
+
+                          // Creating Marker Options
+                          var markerOptions = {
+                             clickable: true,
+                             draggable: true,
+                             icon: customIcon
+                          }
+
+                          for ( var j in latitud){
+
+                              var marker = L.marker([latitud[j], longitud[j]], markerOptions).bindPopup(tipo[j]+"</br><i>País de Origen:</i>"+ origen[j]).addTo(this.map);
+                              marker.setRotationAngle(rotacion[j]);
+                              this.marker.push(marker);
+
+                          }
+
+                         }
+                       ).catch(function (error) {
+                         console.log('Error: ' + error);
+                       });
+
+
+
+                  }
+                  ).catch(function (error) {
+                     console.log('Error: ' + error);
+                  });
+
+
+
+
+              }
+              ).catch(function (error) {
+                console.log('Error: ' + error);
+              });
+
+              this.prueba.push("ya");
+               setTimeout(this.cargar_datos_aviones,10000);
 
          },
 
@@ -447,67 +568,26 @@ export default {
                  console.log('Error: ' + error);
                });
 
-               axios({
-                  method: 'get',
-                  url: 'http://localhost:3000/api/datasets/'+d+'/coordinates/'+this.prov[0]}
-               ).then(response => {
-                   var coord = response.data[0];
-                   var aux= [];
-                   for (var item in coord){
-                     aux.push(coord[item]);
-                   }
-                   this.map.fitBounds([[aux[0],aux[1]],[aux[2],aux[3]]])
+                axios({
+                   method: 'get',
+                   url: 'http://localhost:3000/api/datasets/'+d+'/coordinates/'+this.prov[0]}
+                ).then(response => {
+                    var coord = response.data[0];
+                    var aux= [];
+                    for (var item in coord){
+                      aux.push(coord[item]);
+                    }
+                    this.map.fitBounds([[aux[0],aux[1]],[aux[2],aux[3]]])
 
-                   axios({
-                     method: 'get',
-                     url: 'https://maria93:e8umh8@opensky-network.org/api/states/all?lamin='+aux[0]+'&lomin='+aux[1]+'&lamax='+aux[2]+'&lomax='+aux[3]}
-                   ).then(response => {
-                      var data = response.data
-                      var states = data.states;
-                      var latitud=[];
-                      var longitud=[];
-                      var origen = [];
-                      var rotacion = [];
-                      for ( var i in states){
-                        longitud.push(states[i][5]);
-                        latitud.push(states[i][6]);
-                        origen.push(states[i][2]);
-                        rotacion.push(states[i][10]);
 
-                      }
-                      this.aviones = longitud.length;
 
-                     // Icon options
-                      var iconOptions = {
-                         iconUrl: 'https://image.flaticon.com/icons/svg/723/723955.svg',
-                         iconSize: [15, 15]
-                      }
-                      // Creating a custom icon
-                      var customIcon = L.icon(iconOptions);
+                }
+                ).catch(function (error) {
+                   console.log('Error: ' + error);
+                });
 
-                      // Creating Marker Options
-                      var markerOptions = {
-                         clickable: true,
-                         draggable: true,
-                         icon: customIcon
-                      }
 
-                      for ( var j in latitud){
-                          //markerOptions["rotationAngle"] = rotacion[j];
-                          //this.prueba.push(rotacion[j]);
-                          // Creating a Marker
-                          var marker = L.marker([latitud[j], longitud[j]], markerOptions).bindPopup("<i>País de Origen:</i>"+ origen[j]).addTo(this.map);
-                          marker.setRotationAngle(rotacion[j]);
-                      }
-                     }
-                   ).catch(function (error) {
-                     console.log('Error: ' + error);
-                   });
 
-               }
-               ).catch(function (error) {
-                  console.log('Error: ' + error);
-               });
 
             }
             ).catch(function (error) {
