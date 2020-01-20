@@ -53,9 +53,9 @@
 
          </div>
 
-         <div class="well well-sm" style="font-weight:bold;"> {{secciones_mapa[1]}} {{prov[1]}}</div>
-         <input type="checkbox" id="checkbox" @change="layerChanged_mun(0)" v-model="checked" style="margin-left:5%;">
-         <label for="checkbox" style="margin-left:3%; font-size: 15px; margin-top: 1%">Ver {{secciones_mapa[1]}} </label>
+         <div class="well well-sm" style="font-weight:bold; font-size: 19px; margin:0px"> {{secciones_mapa[1]}} {{prov[1]}}</div>
+         <input type="checkbox" id="checkbox" @change="layerChanged_mun(0)" v-model="checked" style="margin-top:2%; margin-left:6%">
+         <label for="checkbox" style="margin-top:1%; margin-left:2%; font-size: 15px;">Ver {{secciones_mapa[1]}} </label>
 
        </div>
     </div>
@@ -243,7 +243,7 @@ export default {
           this.cargar_datos_dashboard();
           this.cargar_datos_grafica(this.prov);
           this.cargar_datos_aviones();
-          //setInterval(this.cargar_datos_aviones(), 10);
+
 
       },
       methods: {
@@ -815,7 +815,7 @@ export default {
                     years = [];
                     var palabras = [];
                     palabras = i.split("_");
-                    var seccion = palabras[1].charAt(0).toUpperCase() + palabras[1].substring(1 , key.length).toLowerCase();
+                    var seccion = palabras[1].charAt(0).toUpperCase() + palabras[1].substring(1 , palabras[1].length).toLowerCase();
                     this.secciones_grafica.push(seccion);
                     this.secciones_grafica.push("Comparar " + seccion);
 
