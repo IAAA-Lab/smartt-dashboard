@@ -30,13 +30,6 @@ function getDatasetByYear (request, response){
 
 
 
-function getAllData (request, response){
-  Dataset_queries.findAll_data(request.params.id)
-    .then(prov => response.status(200).send(JSON.stringify(prov)));
-
-}
-
-
 function getDataByItems (request, response){
   Dataset_queries.findByItems(request.params.id, request.params.name_item)
     .then(prov => response.status(200).send(JSON.stringify(prov)));
@@ -86,7 +79,6 @@ module.exports = {
   getDatasetById,
   getDatasetByName,
   getDatasetByYear,
-  getAllData,
   getDataByItems,
   getDataByParams,
   getTotalByItems,

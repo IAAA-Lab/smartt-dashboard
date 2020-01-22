@@ -14,7 +14,7 @@ router.get('/datasets/id/:id', dataset_controller.getDatasetById);
 router.get('/datasets/name/:name', dataset_controller.getDatasetByName);
 router.get('/datasets/year/:year', dataset_controller.getDatasetByYear);
 
-router.get('/datasets/:id', dataset_controller.getAllData);
+
 router.get('/datasets/:id/item/:name_item', dataset_controller.getDataByItems);
 router.get('/datasets/:id/data/:name_data', dataset_controller.getDataByParams);
 router.get('/datasets/:id/total_item/:name_item', dataset_controller.getTotalByItems);

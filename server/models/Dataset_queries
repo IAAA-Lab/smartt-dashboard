@@ -4,21 +4,6 @@ const dt = require('../models/Dataset')
 const bodyParser = require('body-parser')
 
 
-
-findAll_data = function(nom){
-  return dt.Dataset.findOne({ where: { datos: {nombre:nom}  }}).then (result => {
-    console.log(JSON.stringify(result.datos.nombre));
-    let nombre = result.datos.nombre;
-    return sequelize.query('SELECT * FROM ' + nombre ,
-      { type: sequelize.QueryTypes.SELECT }
-    ).then(result => {
-      console.log(result);
-      return result;
-    })
-
-  })
-}
-
 findByItems = function(nom,item){
   return dt.Dataset.findOne({ where: { datos: {nombre:nom}  }}).then (result => {
     //console.log(JSON.stringify(result.datos.items));
@@ -31,14 +16,14 @@ findByItems = function(nom,item){
     {
     	if (key == item){
     	  param = key;
-    	  console.log(param);
+
     	}
     }
 
     return sequelize.query('SELECT '+ data[0] + ',' + data[1] +  ',' + param  +' FROM ' + nombre ,
       { type: sequelize.QueryTypes.SELECT }
     ).then(result => {
-      console.log(result);
+
       return result;
     })
 
@@ -47,7 +32,7 @@ findByItems = function(nom,item){
 
 findByData = function(nom,data){
    return dt.Dataset.findOne({ where: { datos: {nombre:nom}  }}).then (result => {
-     console.log(JSON.stringify(result.datos.nombre));
+
      var nombre = result.datos.nombre;
      var datos = result.datos.table_data;
      var param;
@@ -57,14 +42,14 @@ findByData = function(nom,data){
      {
      	if (key == data){
      	  param = datos[key].name;
-     	  console.log(param);
+
      	}
 
      }
 
      if (data == 'name'){
         param1 = datos.id.name;
-        console.log(param1);
+
      }
 
      if (data=='id'){
@@ -93,14 +78,14 @@ TotalItems = function(nom,item){
        {
        	if (key == item){
        	  param = key;
-       	  console.log(param);
+
        	}
        }
 
        return sequelize.query('SELECT SUM('+ param +') FROM ' + nombre ,
          { type: sequelize.QueryTypes.SELECT }
        ).then(result => {
-         console.log(result);
+
          return result;
        })
 
@@ -111,7 +96,7 @@ TotalItems = function(nom,item){
 findById = function(nom,data,id){
 
    return dt.Dataset.findOne({ where: { datos: {nombre:nom}  }}).then (result => {
-     console.log(JSON.stringify(result.datos.nombre));
+
       var nombre= result.datos.nombre;
       var datos=result.datos.table_data;
       var param;
@@ -130,11 +115,11 @@ findById = function(nom,data,id){
      	}
 
      }
-      console.log(d);
+
      for(var k in datos.items)
      {
         params.push(k);
-        console.log(params);
+
 
      }
 
@@ -151,7 +136,7 @@ findById = function(nom,data,id){
 
         }
 
-        console.log(result.length);
+
         return data;
       })
 
@@ -163,7 +148,6 @@ findById = function(nom,data,id){
 findCoordinates = function(nom,id){
 
   return dt.Dataset.findOne({ where: { datos: {nombre:nom}  }}).then (result => {
-   console.log(JSON.stringify(result.datos.nombre));
    var nombre= result.datos.nombre;
    var datos=result.datos.table_data;
    var param = result.datos.table_data.id.name;
@@ -173,7 +157,6 @@ findCoordinates = function(nom,id){
     return sequelize.query('SELECT ST_Extent('+geom+') FROM ' + nombre + ' WHERE '+ param +'=$id',
       { bind: {id: id }, type: sequelize.QueryTypes.SELECT }
     ).then(result => {
-      console.log(result[0].st_extent);
       var datos,aux_min, aux_max, ymin, xmin, ymax, xmax;
       var p1 = result[0].st_extent.indexOf("(");
       var p2 = result[0].st_extent.indexOf(")");
@@ -190,7 +173,7 @@ findCoordinates = function(nom,id){
         xmax = aux_max.substring(0,p2);
         ymax = aux_max.substring(p2+1);
         coord.push({"ymin": ymin, "xmin":xmin, "ymax": ymax, "xmax": xmax });
-        console.log(coord);
+
       }
 
       return coord;
@@ -203,7 +186,7 @@ findCoordinates = function(nom,id){
 findItemsByData = function(nom,id){
 
    return dt.Dataset.findOne({ where: { datos: {nombre:nom}  }}).then (result => {
-     console.log(JSON.stringify(result.datos.nombre));
+
       var nombre= result.datos.nombre;
       var datos=result.datos.table_data;
       var param = datos.id.name;
@@ -212,7 +195,7 @@ findItemsByData = function(nom,id){
      for(var k in datos.items)
      {
         params.push(k);
-        console.log(params);
+
 
      }
 
@@ -230,7 +213,6 @@ findItemsByData = function(nom,id){
 }
 
 module.exports = {
-  findAll_data,
   findByItems,
   findByData,
   TotalItems,

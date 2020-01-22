@@ -43,7 +43,6 @@ findByData_dashboard = function(nom,data){
            	  param = datos[key];
            	}
            }
-       console.log(param);
        return param;
 
      })

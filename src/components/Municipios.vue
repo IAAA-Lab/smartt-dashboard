@@ -1,7 +1,7 @@
 <template>
   <div class="wrapper">
       <div class="well" id="main-header">SMARTT-DASHBOARD
-        <a href="/" class= "float-right" style="color: white; text-decoration: underline;" @click="redirigir()">Elegir Provincia</a>
+        <a href="/" class= "float-right" style="color: white; text-decoration: underline;" @click="redirigir()">Elegir Provincia o Municipio</a>
       </div>
 
       <App v-bind:class="{ active: isActive }"></App>

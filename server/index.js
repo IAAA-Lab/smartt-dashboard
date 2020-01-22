@@ -25,10 +25,6 @@ app.use((req, res, next) => {
 app.use('/api',router);
 
 
-app.get('/', (req, res) => res.status(200).send({
-      message: 'Welcome to the default API route',
-    }));
+//app.listen(port);
 
-app.listen(port, () => {
-  console.log(`App running on port ${port}.`)
-})
+module.exports = server;

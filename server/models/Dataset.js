@@ -48,7 +48,6 @@ findByData_dataset = function(nom,data){
 
           }
        }
-       console.log(result);
 
         return res;
 

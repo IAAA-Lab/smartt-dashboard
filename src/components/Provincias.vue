@@ -1,7 +1,7 @@
 <template>
   <div class="wrapper">
     <div class="well" id="main-header">SMARTT-DASHBOARD
-      <a href="/" class= "float-right" style="color: white; text-decoration: underline;" @click="redirigir()">Elegir Provincia</a>
+      <a href="/" class= "float-right" style="color: white; text-decoration: underline;" @click="redirigir()">Elegir Provincia o Municipio</a>
     </div>
 
     <App v-bind:class="{ active: isActive }"></App>
@@ -129,7 +129,7 @@
     <div id="footer">
      <img src="../assets/logoUZ.png" alt="Smiley face" height="100" width="300" style="float: right">
      <div style="text-align: left">
-      Licencia de datos {{prueba}}
+      Licencia de datos
      </div>
     </div>
 
