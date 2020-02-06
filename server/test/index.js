@@ -202,7 +202,7 @@ describe('Datasets', () => {
           var d = await response.json();
           expect(d[0].cod).to.equals('28');
           expect(d[0].año).to.equals('2017');
-          console.log(d)
+
         });
   });
 

@@ -93,7 +93,7 @@
                       Tablas de datos
                     </button>
                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="width:100%">
-                      <button type="button" class="btn float-right" @click="descargarCSV(p_parque,tabla_th_v)" style="margin-top:1%; margin-right:1%">Descargar CSV</button>
+                      <button type="button" class="btn float-right" @click="descargarCSV(datos_tabla,tabla_th)" style="margin-top:1%; margin-right:1%">Descargar CSV</button>
                       <div class="table-responsive" style="margin-top:5%">
                         <table class="table table-striped" align="center" style="margin-top:2%; width:98%">
                          <thead>
@@ -125,8 +125,12 @@
 
       <div id="footer">
        <img src="../assets/logoUZ.png" alt="Smiley face" height="100" width="300" style="float: right">
-       <div style="text-align: left">
-        Licencia de datos {{prueba}}
+       <div style="text-align: left; font-family: Montserrat; font-size: 14px;">
+        Licencia de datos: <br>
+          - BDLJE 2018 CC-BY 4.0 ign.es <br>
+          - Elaboración propiia con datos extraídos del sitio web del INE: <br>
+            www.ine.es y de la DGT: www.dgt.es (2015-2018) <br>
+          - Tree Cover Loss CC-BY 4.0 Hansen/UMD/Google/USGS/NASA
        </div>
       </div>
   </div>
@@ -149,13 +153,7 @@ export default {
               map: [],
               wmsLayer_p: [],
               wmsLayer_m: [],
-              layers: [],
-              layers_m: [],
               years:[],
-              legends: [],
-              items_pob: [],
-              items_v: [],
-              items_v_mod: [],
               items:[],
 
               year_select: null,
@@ -163,34 +161,15 @@ export default {
               ourCustomLegend: null,
               ourCustomLegend_m: null,
               checked: false,
-              cont_series: null,
-
-
-              prueba: [],
-
 
               title: '',
               modo: 'line',
 
-              series_prov: [],
-              series_v_prov: [],
-              series_comp_poblacion: [],
-              series_comp_vehiculos: [],
-              p_poblacion: [],
-              p_parque:[],
-              p_poblacion_c:[],
-              p_parque_c:[],
+
               municipios: [],
-              mun_select_p: [],
-              mun_select_v: [],
-              tabla_th: [],
-              tabla_th_v: [],
-              entrar: false,
-              total_pob: null,
-              total_turismos: null,
               isActive: false,
               aviones:null,
-              coordenadas: [],
+
 
               secciones_mapa: [],
               datos_dashboard: [],
@@ -203,7 +182,6 @@ export default {
               patrones_grafica: [],
               years_patrones:[],
               years_patrones_aux:[],
-              series: [],
               chartOp: [],
               mun_select:null,
               item_select_anterior:null,
@@ -372,7 +350,6 @@ export default {
                 console.log('Error: ' + error);
               });
 
-              this.prueba.push("ya");
                setTimeout(this.cargar_datos_aviones,10000);
 
          },
@@ -521,7 +498,6 @@ export default {
                    ).then(response => {
                        var data_map = response.data;
                        var datos_mapa =data_map["layers"];
-                       //this.prueba.push(this.datos_mapa)
                        for (var data in datos_mapa){
                           this.items.push(datos_mapa[data].name)
 
@@ -587,70 +563,49 @@ export default {
 
          },
 
-         layerChanged(op) {
+         async layerChanged(op) {
             var layer_title;
             var year = this.year_select;
+            var urls = [], urls1 = [];
+            var results = [], results1=[];
 
             if (op=="0"){
-              this.items = [];
+                var n_year = year.substring(year.length, year.length -2)
 
                for (var item in this.patrones){
-                this.prueba.push(this.patrones[item]);
-                   var rango_y = this.years_patrones[item]
-                   var years = rango_y.split("-");
-                   if (years[0]<= year && year<=years[1]){
-                       var n_year = year.substring(year.length, year.length -2)
 
-                       var p = this.patrones[item]
-                       var d = p.replace("XX", n_year);
+                 var p = this.patrones[item]
+                 var d = p.replace("XX", n_year);
 
 
-                       axios({
-                          method: 'get',
-                          url: 'http://localhost:3000/api/datasets/'+d+'/mapa'}
-                       ).then(response => {
-                           var data_map = response.data;
-                           var datos_mapa =data_map["layers"];
-                           for (var i in datos_mapa){
-                              this.datos_mapa.push(datos_mapa[i]);
-                           }
-                           for (var data in datos_mapa){
-                              this.items.push(datos_mapa[data].name)
+                 urls.push('http://localhost:3000/api/datasets/'+d+'/mapa');
 
-                           }
-                       }
-                       ).catch(function (error) {
-                          console.log('Error: ' + error);
-                       });
-                   }
                }
+               results = await axios.all(urls.map(x => axios.get(x)));
+
+               for (var result in results){
+                 var layers_aux = results[result].data.layers;
+                 for (var l in layers_aux){
+                    this.datos_mapa.push(layers_aux[l]);
+                 }
+
+               }
+
                for (var item in this.patrones_aux){
-                   var rango_y = this.years_patrones_aux[item]
-                   var years = rango_y.split("-");
-                   if (years[0]<= year && year<=years[1]){
-                       var n_year = year.substring(year.length, year.length -2)
+                  var p_aux = this.patrones_aux[item]
+                  var d_aux = p_aux.replace("XX", n_year);
+                  urls1.push('http://localhost:3000/api/datasets/'+d_aux+'/mapa');
 
-                       var p = this.patrones_aux[item]
-                       var d = p.replace("XX", n_year);
-
-
-                       axios({
-                          method: 'get',
-                          url: 'http://localhost:3000/api/datasets/'+d+'/mapa'}
-                       ).then(response => {
-                           var data_map = response.data;
-                           var datos_mapa_aux =data_map["layers"];
-                           for (var i in datos_mapa_aux){
-                              this.datos_mapa_aux.push(datos_mapa_aux[i]);
-                           }
-
-                       }
-                       ).catch(function (error) {
-                          console.log('Error: ' + error);
-                       });
-                   }
                }
+               results1 = await axios.all(urls1.map(x => axios.get(x)));
 
+               for (var result in results1){
+                 var layers_aux = results1[result].data.layers;
+                 for (var l in layers_aux){
+                    this.datos_mapa_aux.push(layers_aux[l]);
+                 }
+
+               }
 
             }
 
@@ -841,7 +796,7 @@ export default {
                  }
                  this.cargar_datos_series(patrones,mun);
 
-                  //this.prueba.push(this.chartOp)
+
 
               }
               ).catch(function (error) {
@@ -851,7 +806,6 @@ export default {
           },
 
           async cargar_datos_series(patrones,mun){
-              //this.prueba.push(this.chartOp)
               var datos_grafica = [];
               var categorias = [];
               var series= [];
@@ -877,12 +831,10 @@ export default {
                        for(var p in patrones_s){
                           var patron_p = patrones_s[p];
 
-                          //this.prueba.push(patron_p);
                           urls.push('http://localhost:3000/api/datasets/'+patron_p+'/items/'+mun[0]);
 
                        }
                        results = await axios.all(urls.map(x => axios.get(x)));
-                       //this.prueba.push(results)
                        var datos_result;
 
                        for (var i=0; i<results.length; i++){
@@ -900,7 +852,6 @@ export default {
               }
 
 
-              //this.prueba.push(this.chartOp)
 
               var items_aux = [];
               var items = [];
@@ -963,7 +914,6 @@ export default {
 
 
                }
-               //this.prueba.push(this.chartOp);
 
 
 
@@ -1015,7 +965,6 @@ export default {
                             for(var p in patrones_s){
                               var patron_p = patrones_s[p];
 
-                              //this.prueba.push(patron_p);
                               urls.push('http://localhost:3000/api/datasets/'+patron_p+'/items/'+mun[0]);
 
                             }
@@ -1027,7 +976,6 @@ export default {
                                 var chart_series = chart_op.series
 
                                 for (var d in data){
-                                  //this.prueba.push(d+"-"+data[d]);
                                   var name_s = d;
                                   if (name_s.indexOf("_") !==-1){
                                     name_s = name_s.replace("_"," ");
@@ -1073,7 +1021,7 @@ export default {
 
 
             for (var municipios in mun){
-                this.prueba.push(prov[municipios]);
+
                 var municipios = mun[municipios]
 
 
@@ -1089,7 +1037,6 @@ export default {
                    }
 
                    if (seccion.indexOf(item) !==-1){
-                       this.prueba.push(item);
                        this.tabla_th = [];
                        this.datos_tabla = [];
                        for(var p in patrones_s){

@@ -26,10 +26,9 @@
                 <a href="#" data-dismiss="modal" class="btn" style="background:#336680; color: white" @click="redirigir(mun_select)">Aceptar</a>
                </div>
           </div>
-          {{prueba}}
+
        </div>
     </div>
-
 
 
     <router-view></router-view>
@@ -49,12 +48,6 @@ export default {
            municipios: [],
            prov_select: [],
            mun_select: [],
-           dashboard_1: [],
-           dashboard_2: [],
-           datos_d1:[],
-
-           prueba:[]
-
           }
 
     },
@@ -72,16 +65,40 @@ export default {
 
       cargarProvincias(){
 
+
         axios({
           method: 'get',
-          url: 'http://localhost:3000/api/datasets/p_poblacion18/data/name'}
+          url: 'http://localhost:3000/api/dashboard/name/TFG'}
         ).then(response => {
-           var data = response.data
-           for(var key in data){
-             this.provincias.push({"cod": data[key].cod, "nom": data[key].nom});
-           }
+            var data = response.data.datos.dashboards.provincias;
+            var datasets = [];
+            for ( var key in data){
+              datasets.push(data[key]);
+            }
+            var d = datasets[0];
+            var rango_years = d.años;
+            var patron =d.patron;
+            var years = rango_years.split("-");
+            var last_year = years[1];
+            var year = last_year.substring(last_year.length, last_year.length -2)
 
-          }
+            var dataset = patron.replace("XX", year);
+
+            axios({
+              method: 'get',
+              url: 'http://localhost:3000/api/datasets/'+dataset+'/data/name'}
+            ).then(response => {
+               var data = response.data
+               for(var key in data){
+                 this.provincias.push({"cod": data[key].cod, "nom": data[key].nom});
+               }
+
+              }
+            ).catch(function (error) {
+              console.log('Error: ' + error);
+            });
+
+        }
         ).catch(function (error) {
           console.log('Error: ' + error);
         });
@@ -90,10 +107,29 @@ export default {
 
       onChange($event){
 
+
+        axios({
+          method: 'get',
+          url: 'http://localhost:3000/api/dashboard/name/TFG'}
+        ).then(response => {
+            var data = response.data.datos.dashboards.municipios;
+            var datasets = [];
+            for ( var key in data){
+              datasets.push(data[key]);
+            }
+            var d = datasets[0];
+            var rango_years = d.años;
+            var patron =d.patron;
+            var years = rango_years.split("-");
+            var last_year = years[1];
+            var year = last_year.substring(last_year.length, last_year.length -2)
+
+            var dataset = patron.replace("XX", year);
+
             axios({
                method: 'get',
-               url: 'http://localhost:3000/api/datasets/m_poblacion18/data/prov/'+this.prov_select[0]}
-             ).then(response => {
+               url: 'http://localhost:3000/api/datasets/'+dataset+'/data/prov/'+this.prov_select[0]}
+            ).then(response => {
                 var data = response.data
                 this.municipios=[];
                 for(var key in data){
@@ -102,9 +138,15 @@ export default {
                 }
 
                }
-             ).catch(function (error) {
+            ).catch(function (error) {
                console.log('Error: ' + error);
-             });
+            });
+
+        }
+        ).catch(function (error) {
+          console.log('Error: ' + error);
+        });
+
 
       },
 

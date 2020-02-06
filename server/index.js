@@ -25,6 +25,6 @@ app.use((req, res, next) => {
 app.use('/api',router);
 
 
-//app.listen(port);
+if(!module.parent){ app.listen(port); }
 
 module.exports = server;
